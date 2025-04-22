@@ -3,6 +3,7 @@ import logging
 import time
 import paramiko
 import sys
+import select
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +38,82 @@ class Controller:
         # 8192 is paramiko default bufsize
         self.stdin, self.stdout, self.stderr = \
             self.session.exec_command("gpascii -2", bufsize=8192)
+        print(success)
 
-    def send_cmd(self, cmd):
-        """ send """
+        # wait until gpascii ready
+        while self._read_until("Input") == "":
+            pass
+
+
+    def _read_until(self, termstr):
+        """ a non-async single non-blocking read into rcv_buffer and
+        will return the string up to termstr off the buffer if available """
+        # if its not already in the buffer then get more from buffer
+        self.read_to_buf()
+
+        if self.err_buffer  != [""]:
+            for error in self.err_buffer:
+                # error_temp = error.decode("utf-8")
+                error_temp = error # .decode("utf-8")
+                logger.error(f"std_err:{error_temp}") #self.err_buffer}")
+
+            #self.err_buffer = [] #""
+            assert False, f"std_err: {self.err_buffer}"
+
+        response = self._read_buf_until(termstr)  # fast read from buffer
+        if response != "":
+            self.num_received += 1
+        return response
+
+    def _read_buf_until(self, termstr):
+        ack_pos = self.rcv_buffer.find(termstr)
+        if ack_pos == -1:
+            return ""
+        response = self.rcv_buffer[0:ack_pos]
+        ack_pos = ack_pos + len(termstr)  # increment past "\x06"
+
+        if ack_pos >= len(self.rcv_buffer):
+            ack_pos = len(self.rcv_buffer)
+
+        self.rcv_buffer = self.rcv_buffer[ack_pos:]
+
+        return response
+
+    def read_to_buf(self):
+        """just get any data off ssh and put into local buffer """
         st_time = time.time()
-        logger.debug(f"sendin {cmd}")
-        self.num_sent += 1
-        self.stdin.write(cmd + "\n")
-        self.stdin.flush()
-        self.send_time += time.time() - st_time
+        # non-blocking read
+        self.rcv_buffer += self.nb_read()
+
+        errors = self.nb_read_stderr()
+
+        errors = errors.split("\n")  
+
+        self.err_buffer = errors
+
+        self.rcv_time += time.time() - st_time
+
+    def nb_read(self):
+        """non-blocking read
+        returns whatever in stdout, up to 1024 bytes"""
+        buffer = ""
+        # Only get data if there is data to read in the channel
+        if self.stdout.channel.recv_ready():
+            rl, wl, xl = select.select([self.stdout.channel], [], [], 0.0)
+            if len(rl) > 0:
+                buffer = self.stdout.channel.recv(1024).decode("utf-8")
+
+        return buffer
+
+    def nb_read_stderr(self):
+        """ non-blocking read of stderr"""
+        buffer = ""
+        # Only get data if there is data to read in the channel
+        if self.stderr.channel.recv_stderr_ready():
+            buffer = self.stderr.channel.recv_stderr(1024).decode("utf-8")
+            print(f"received(stderr): {buffer}")
+        return buffer
+
 
     def send_receive_low(self, cmd_list, stripchar="\r\n\x06"):
         """ send a list of commands & receive a list back"""
@@ -62,7 +130,71 @@ class Controller:
                 reply_num += 1
 
         return out_dict
+
+    def send_cmd(self, cmd):
+        """ send """
+        st_time = time.time()
+        logger.debug(f"sendin {cmd}")
+        self.num_sent += 1
+        self.stdin.write(cmd + "\n")
+        self.stdin.flush()
+        self.send_time += time.time() - st_time
+
+    def process_response(self, response, cmd_expected, stripchar="\r\n\x06"):
+        """ takes raw string from ppmac, and finters and checks
+        returns [cmd, response] pair"""
+        # strip off undesired char
+        for char in stripchar:
+            response = response.replace(char, "")
     
+        if response == "":
+            #assert response != "", 
+            logger.info(f"sync error, empty response from cmd= {cmd_expected}")
+
+        if response.find("=") != -1:
+            cmd_response = [cmd_expected, response.split("=")[1]]
+            intended_cmd = cmd_expected.lower()
+            cmd_received = response.split("=")[0].lower()
+            assert cmd_received == intended_cmd, f"sync error, {response.split('=')[0]} != {cmd_expected}"
+        else:
+            cmd_response = [cmd_expected, response]
+        
+        return cmd_response
+
+        
+    def send_motion_prog(self, prog_name, buffer):
+        """
+        buffer is a list of strings to be \\n 
+        terminated when sent to the brick.
+        Adds:
+        "open prog xxxx" at the top, and
+        "close" at the end. 
+        """
+        # TODO: check the buffer?
+
+        st_time = time.time()
+        buffer_reply1 = self.send_receive_low([f"open prog {prog_name}"])
+        buffer_reply2 = self.send_receive_low(buffer)
+        buffer_reply3 = self.send_receive_low([f"close"])
+
+        # TODO: check reply
+        #  note however that low-level will detect some errors
+
+        time_taken =  time.time() - st_time
+        print(f"sending took={time_taken:0.1f}s")
+
+        # TODO: return success/fail status. check with a readback?
+
+    def get_motion_prog(self, prog_name):
+        """ get a readback
+        """
+        program_list_dict = self.send_receive_low([f"list prog {prog_name}"], stripchar="\r\x06")
+        readback_prog = program_list_dict[f"list prog {prog_name}"][1]
+        readback_prog = readback_prog.split("\n")
+
+        # TODO: return success/fail status.
+        return readback_prog
+
     def send_receive_with_print(self, cmd):
         response_dict = self.send_receive_low([cmd])
 
@@ -101,17 +233,18 @@ class Controller:
         return vel
 
     def set_velocity(self, chan, vel):
-        cmd = f"#{chan}v={vel}"
+        cmd = f"motor[{chan}].JogSpeed = {vel}"
         self.send_receive_with_print(cmd)
+        time.sleep(1)
     
-ppmac = Controller(host="10.209.1.1")
+ppmac = Controller(host="10.23.231.3")
 ppmac.connect()
 chan = 1
 posn = ppmac.get_pos(chan)
-posn += 1 # increment by 1 [mm]
-ppmac.move_to_pos_wait(chan, posn)
-posn = ppmac.get_pos(chan)
-ppmac.set_velocity(chan, 10)
+# posn += 10 # increment by 1 [mm]
+# ppmac.move_to_pos_wait(chan, posn)
+# posn = ppmac.get_pos(chan)
+ppmac.set_velocity(chan, 0.01)
 posn += 10
 ppmac.move_to_pos(chan, posn)
 ppmac.get_velocity(chan)
