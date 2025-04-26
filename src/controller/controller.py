@@ -44,6 +44,23 @@ class Controller:
         while self._read_until("Input") == "":
             pass
 
+    def disconnect(self):
+        """ close the connection """
+        self.session.close()
+        logger.info("Disconnected.")
+        self.rcv_buffer = ""
+        self.err_buffer = [] # ""
+        self.send_time = 0
+        self.rcv_time = 0
+        self.num_sent = 0
+        self.num_received = 0
+        self.prev_index = 0
+        self.stdin = None
+        self.stdout = None
+        self.stderr = None
+        self.session = None
+        logger.info("Success, disconnected.")
+
 
     def _read_until(self, termstr):
         """ a non-async single non-blocking read into rcv_buffer and
@@ -161,40 +178,6 @@ class Controller:
         
         return cmd_response
 
-        
-    def send_motion_prog(self, prog_name, buffer):
-        """
-        buffer is a list of strings to be \\n 
-        terminated when sent to the brick.
-        Adds:
-        "open prog xxxx" at the top, and
-        "close" at the end. 
-        """
-        # TODO: check the buffer?
-
-        st_time = time.time()
-        buffer_reply1 = self.send_receive_low([f"open prog {prog_name}"])
-        buffer_reply2 = self.send_receive_low(buffer)
-        buffer_reply3 = self.send_receive_low([f"close"])
-
-        # TODO: check reply
-        #  note however that low-level will detect some errors
-
-        time_taken =  time.time() - st_time
-        print(f"sending took={time_taken:0.1f}s")
-
-        # TODO: return success/fail status. check with a readback?
-
-    def get_motion_prog(self, prog_name):
-        """ get a readback
-        """
-        program_list_dict = self.send_receive_low([f"list prog {prog_name}"], stripchar="\r\x06")
-        readback_prog = program_list_dict[f"list prog {prog_name}"][1]
-        readback_prog = readback_prog.split("\n")
-
-        # TODO: return success/fail status.
-        return readback_prog
-
     def send_receive_with_print(self, cmd):
         response_dict = self.send_receive_low([cmd])
 
@@ -234,6 +217,11 @@ class Controller:
 
     def set_velocity(self, chan, vel):
         cmd = f"motor[{chan}].JogSpeed = {vel}"
+        self.send_receive_with_print(cmd)
+        time.sleep(1)
+
+    def zero_out(self, chan):
+        cmd = f"motor[{chan}].zero" # check this actual command
         self.send_receive_with_print(cmd)
         time.sleep(1)
     
