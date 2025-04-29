@@ -9,7 +9,7 @@ def main():
     test = MoveTestAbsolute(test_name="Test 1", posn=10.0, precision=0.01)
     result = test.execute(motor=1, encoder=9)
 
-    test2 = VelocityTest(test_name = "Test 2", velocity = 0.004)
+    test2 = VelocityTest(test_name="Test 2", velocity = 0.004)
     result2 = test2.execute(motor=1, encoder=9)
 
     print(result)
