@@ -185,16 +185,18 @@ class Controller:
         response = response_dict[cmd][1]
         # response_dict contains dictionary of commands sent, and their response.
     
-        print(f"sent \" {cmd} \"")
-        print(f"response \" {response} \"")
+        #print(f"sent \" {cmd} \"")
+        #print(f"response \" {response} \"")
         return response
     
     def wait_till_done(self, chan):
         cmd = f"motor[{chan}].inpos"
         inpos_state = int(self.send_receive_with_print(cmd))
+        print("Waiting Till Done")
         while (inpos_state) != 1:
             inpos_state = int(self.send_receive_with_print(cmd))
             time.sleep(0.1)
+        print("DONE!")
     
     def move_to_pos_wait(self, chan, posn):
         cmd = f"#{chan}j={posn}"
@@ -203,6 +205,25 @@ class Controller:
 
     def move_to_pos(self, chan, posn):
         cmd = f"#{chan}j={posn}"
+        self.send_receive_with_print(cmd)
+
+    def move_by_relative_pos_wait(self, chan, relPosn):
+        cmd = f"#{chan}j^{relPosn}"
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
+
+    def move_to_end_pos_wait(self, chan):
+        cmd = f"#{chan}j+"
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
+
+    def move_to_end_neg_wait(self, chan):
+        cmd = f"#{chan}j-"
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
+
+    def move_to_end_neg(self, chan):
+        cmd = f"#{chan}j-"
         self.send_receive_with_print(cmd)
 
     def get_pos(self, chan):
@@ -225,16 +246,17 @@ class Controller:
         self.send_receive_with_print(cmd)
         time.sleep(1)
     
-ppmac = Controller(host="10.23.231.3")
-ppmac.connect()
-chan = 1
-posn = ppmac.get_pos(chan)
+#ppmac = Controller(host="10.23.231.3")
+#ppmac.connect()
+#chan = 9
+#posn = ppmac.get_pos(chan)
+#print(posn)
 # posn += 10 # increment by 1 [mm]
 # ppmac.move_to_pos_wait(chan, posn)
 # posn = ppmac.get_pos(chan)
-ppmac.set_velocity(chan, 0.01)
-posn += 10
-ppmac.move_to_pos(chan, posn)
-ppmac.get_velocity(chan)
-ppmac.wait_till_done(chan)
-posn = ppmac.get_pos(chan)
+#ppmac.set_velocity(chan, 0.01)
+#posn += 10
+#ppmac.move_to_pos(chan, posn)
+#ppmac.get_velocity(chan)
+#ppmac.wait_till_done(chan)
+#posn = ppmac.get_pos(chan)
