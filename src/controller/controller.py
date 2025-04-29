@@ -237,7 +237,7 @@ class Controller:
         return vel
 
     def set_velocity(self, chan, vel):
-        cmd = f"motor[{chan}].JogSpeed = {vel}"
+        cmd = f"Motor[{chan}].JogSpeed = {vel}"
         self.send_receive_with_print(cmd)
         time.sleep(1)
 

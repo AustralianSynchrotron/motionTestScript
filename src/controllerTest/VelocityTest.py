@@ -5,7 +5,7 @@ import time
 
 class VelocityTest(MotionControlTest):
 
-    def __init__(self, test_name: str, velocity: float, precision: float = 0.001):
+    def __init__(self, test_name: str, velocity: float, precision: float = 0.0002):
         super().__init__(test_name)
         self.velocity = velocity
         self.precision = precision
@@ -19,14 +19,15 @@ class VelocityTest(MotionControlTest):
         controller.connect()
         
         controller.move_to_end_pos_wait(motor)
+        controller.set_velocity(motor, self.velocity)
         controller.move_to_end_neg(motor)
-        time.sleep(1)
+        time.sleep(2)
         vol = controller.get_velocity(encoder)
 
 
         
 
-        if abs(vol - self.velocity) < self.precision:
+        if abs(vol) - abs(self.velocity) < self.precision:
             result = MotionControlResult(success=True, message="Velocity test passed.")
         else:
             message = f"Velocity test failed. Expected: {self.velocity}, Actual: {vol}"
