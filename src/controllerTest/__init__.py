@@ -1,3 +1,3 @@
-from controllerTest import MotionControlTest, MotionControlResult, MoveTestAbsolute, VelocityTest
+from controllerTest import MotionControlTest, MotionControlResult, MoveTestAbsolute, VelocityTest, LimitTest, PrecisionTest
 
-__all__ = ["MotionControlTest", "MotionControlResult", "MoveTestAbsolute", "VelocityTest"]
+__all__ = ["MotionControlTest", "MotionControlResult", "MoveTestAbsolute", "VelocityTest", "LimitTest", "PrecisionTest"]
