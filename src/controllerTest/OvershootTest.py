@@ -1,12 +1,12 @@
-from controllerTest.MotionControlResult import MotionControlResult
-from controllerTest.MotionControlTest import MotionControlTest
+from .MotionControlTest import MotionControlTest
+from .MotionControlResult import MotionControlResult
 from controller import Controller
 import time
 
 class OvershootTest(MotionControlTest):
 
     def __init__(self, test_name: str, precision: float = 0.001, distance: float = 10):
-            super().__init__(test_name)
+            super().__init__(test_name, "Overshoot Test")
             self.precision = precision
             self.distance = distance
 
@@ -28,13 +28,12 @@ class OvershootTest(MotionControlTest):
             #start moving
             controller.move_to_pos(motor, self.distance)
             peak_position = 0
-            while True:
+            inpos_state = controller.in_pos(motor)
+            while (inpos_state) != 1:
                 pos = controller.get_pos(encoder)
                 peak_position = max(peak_position, pos)
-                cmd = f"motor[{encoder}].inpos"
-                if int(self.send_receive_with_print(cmd) == 1):
-                    break
-                time.sleep(0.1)
+                inpos_state =  controller.in_pos(motor)
+                #time.sleep(0.05)
             # calculate the overshoot
             overshoot = peak_position - self.distance
             print(f"Speed: {speed}, Overshoot: {overshoot}")

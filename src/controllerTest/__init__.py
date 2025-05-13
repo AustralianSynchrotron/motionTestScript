@@ -4,5 +4,6 @@ from .MoveTestAbsolute import MoveTestAbsolute
 from .VelocityTest import VelocityTest
 from .LimitTest import LimitTest
 from .PrecisionTest import PrecisionTest
+from .OvershootTest import OvershootTest
 
-__all__ = ["MotionControlTest", "MotionControlResult", "MoveTestAbsolute", "VelocityTest", "LimitTest", "PrecisionTest"]
+__all__ = ["MotionControlTest", "MotionControlResult", "MoveTestAbsolute", "VelocityTest", "LimitTest", "PrecisionTest", "OvershootTest"]

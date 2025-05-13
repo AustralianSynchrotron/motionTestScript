@@ -245,6 +245,11 @@ class Controller:
         cmd = f"motor[{chan}].zero" # check this actual command
         self.send_receive_with_print(cmd)
         time.sleep(1)
+
+    def in_pos(self, chan):
+        cmd = f"motor[{chan}].inpos"
+        inpos_state = int(self.send_receive_with_print(cmd))
+        return inpos_state
     
 #ppmac = Controller(host="10.23.231.3")
 #ppmac.connect()
