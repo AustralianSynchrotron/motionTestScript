@@ -192,11 +192,11 @@ class Controller:
     def wait_till_done(self, chan):
         cmd = f"motor[{chan}].inpos"
         inpos_state = int(self.send_receive_with_print(cmd))
-        print("Waiting Till Done")
+        #print("Waiting Till Done")
         while (inpos_state) != 1:
             inpos_state = int(self.send_receive_with_print(cmd))
             time.sleep(0.1)
-        print("DONE!")
+        #print("DONE!")
     
     def move_to_pos_wait(self, chan, posn):
         cmd = f"#{chan}j={posn}"
