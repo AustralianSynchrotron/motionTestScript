@@ -1,7 +1,4 @@
-from controllerTest.MoveTestAbsolute import MoveTestAbsolute
-from controllerTest.VelocityTest import VelocityTest
-from controllerTest.LimitTest import LimitTest
-from controllerTest.PrecisionTest import PrecisionTest
+from controllerTest import MoveTestAbsolute, VelocityTest, LimitTest, PrecisionTest
 
 def main():
     """

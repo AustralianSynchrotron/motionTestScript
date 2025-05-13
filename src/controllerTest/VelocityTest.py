@@ -1,5 +1,4 @@
-from controllerTest.MotionControlResult import MotionControlResult
-from controllerTest.MotionControlTest import MotionControlTest
+from controllerTest import MotionControlResult, MotionControlTest
 from controller import Controller
 import time
 
