@@ -5,7 +5,7 @@ from controller import Controller
 class MoveTestAbsolute(MotionControlTest):
 
     def __init__(self, test_name: str, posn: float, precision: float = 0.01):
-        super().__init__(test_name)
+        super().__init__(test_name, "Absolute Move Test")
         self.posn = posn
         self.precision = precision
 

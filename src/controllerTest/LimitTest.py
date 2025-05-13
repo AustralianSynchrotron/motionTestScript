@@ -6,7 +6,7 @@ import time
 class LimitTest(MotionControlTest):
 
     def __init__(self, test_name: str):
-            super().__init__(test_name)
+            super().__init__(test_name, "Limit Test")
 
     def execute(self, motor: int, encoder: int):
         #connect to the controller

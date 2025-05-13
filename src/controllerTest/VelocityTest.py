@@ -6,7 +6,7 @@ import time
 class VelocityTest(MotionControlTest):
 
     def __init__(self, test_name: str, velocity: float, precision: float = 0.0002):
-        super().__init__(test_name)
+        super().__init__(test_name, "Velocity Test")
         self.velocity = velocity
         self.precision = precision
 
