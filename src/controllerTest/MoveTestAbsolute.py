@@ -3,8 +3,8 @@ from controller import Controller
 
 class MoveTestAbsolute(MotionControlTest):
 
-    def __init__(self, test_name: str, posn: float, precision: float = 0.01):
-        super().__init__(test_name, "Absolute Move Test")
+    def __init__(self, test_name: str, posn: float, controller: Controller, precision: float = 0.01):
+        super().__init__(test_name, "Absolute Move Test", controller)
         self.posn = posn
         self.precision = precision
 
@@ -13,8 +13,7 @@ class MoveTestAbsolute(MotionControlTest):
         Run the move test.
         """
 
-        controller = Controller(host="10.23.231.3")
-        controller.connect()
+        controller = self.controller
         initial_pos = controller.get_pos(encoder)
 
         controller.move_to_pos_wait(motor, self.posn)

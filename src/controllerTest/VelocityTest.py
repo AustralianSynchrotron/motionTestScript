@@ -4,8 +4,8 @@ import time
 
 class VelocityTest(MotionControlTest):
 
-    def __init__(self, test_name: str, velocity: float, precision: float = 0.0002):
-        super().__init__(test_name, "Velocity Test")
+    def __init__(self, test_name: str, velocity: float, controller: Controller, precision: float = 0.0002):
+        super().__init__(test_name, "Velocity Test", controller)
         self.velocity = velocity
         self.precision = precision
 
@@ -14,8 +14,7 @@ class VelocityTest(MotionControlTest):
         Run the move test.
         """
 
-        controller = Controller(host="10.23.231.3")
-        controller.connect()
+        controller = self.controller
         
         controller.move_to_end_pos_wait(motor)
         controller.set_velocity(motor, self.velocity)

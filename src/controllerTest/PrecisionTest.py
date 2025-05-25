@@ -3,8 +3,8 @@ from controller import Controller
 
 class PrecisionTest(MotionControlTest):
 
-    def __init__(self, test_name: str, startPosn: float, endPosn: float, precision: float = 0.01, runs: int = 10):
-        super().__init__(test_name, "Precision Test")
+    def __init__(self, test_name: str, startPosn: float, endPosn: float, controller: Controller, precision: float = 0.01, runs: int = 10):
+        super().__init__(test_name, "Precision Test", controller)
         self.startPosn = startPosn
         self.endPosn = endPosn
         self.precision = precision
@@ -15,8 +15,7 @@ class PrecisionTest(MotionControlTest):
         Run the move test.
         """
 
-        controller = Controller(host="10.23.231.3")
-        controller.connect()
+        controller = self.controller
 
         controller.move_to_pos_wait(motor, self.startPosn)
         

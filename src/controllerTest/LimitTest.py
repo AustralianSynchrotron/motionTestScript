@@ -4,13 +4,12 @@ import time
 
 class LimitTest(MotionControlTest):
 
-    def __init__(self, test_name: str):
-            super().__init__(test_name, "Limit Test")
+    def __init__(self, test_name: str, controller: Controller):
+            super().__init__(test_name, "Limit Test", controller)
 
     def execute(self, motor: int, encoder: int):
         #connect to the controller
-        controller = Controller(host="10.23.231.3")
-        controller.connect()
+        controller = self.controller
         
         #move to positive end position
         #controller.set_velocity(motor, 0.001)
