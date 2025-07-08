@@ -251,6 +251,13 @@ class Controller:
         inpos_state = int(self.send_receive_with_print(cmd))
         return inpos_state
     
+    def current_fetch(self, chan):
+        cmd = f"motor[{chan}].IqMeas"
+        current_ADC = float(self.send_receive_with_print(cmd))
+        sensor_scaling_factor = 1/1000  # Example scaling factor, adjust as needed
+        current = current_ADC * sensor_scaling_factor
+        return current
+    
 #ppmac = Controller(host="10.23.231.3")
 #ppmac.connect()
 #chan = 9
