@@ -8,25 +8,25 @@ try:
     #initialisation
     controller = Controller(host="10.23.231.3")
     controller.connect()
-    time_step = 0.01
-    times = np.arange(0,3,time_step)
-    currents = []
+    time_period = 3
+    time_step = 0.1
+    time_array = np.arange(0, time_period, time_step)
 
     #move
-    controller.move_to_pos(chan=1, posn=-20)
+    #reset postion
+    controller.move_to_pos_wait(chan=1, posn=0)
+    #move the stage
+    controller.move_to_pos(chan=1, posn=20)
 
-    for i in range(len(times)):
-        current = controller.current_fetch(chan=1)
-        currents.append(current)
-        print(current)
-        time.sleep(0.01)
+    currents = controller.current_fetch(chan=1, time_period=time_period, time_step=time_step)
+    print(currents)
 
     controller.disconnect()
 
     #plotting
     print(len(currents))
-    print(len(times))
-    plt.plot(times, currents)
+    print(len(time_array))
+    plt.plot(time_array, currents)
     plt.title("Current(A) aginst time")
     plt.xlabel("Time in " + str(time_step) + " second steps")
     plt.ylabel("Current in A")

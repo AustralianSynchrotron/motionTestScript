@@ -4,6 +4,7 @@ import time
 import paramiko
 import sys
 import select
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -251,12 +252,40 @@ class Controller:
         inpos_state = int(self.send_receive_with_print(cmd))
         return inpos_state
     
-    def current_fetch(self, chan):
-        cmd = f"motor[{chan}].IqMeas"
-        current_ADC = float(self.send_receive_with_print(cmd))
-        sensor_scaling_factor = 1/1000  # Example scaling factor, adjust as needed
-        current = current_ADC * sensor_scaling_factor
-        return current
+    def current_fetch(self, chan, time_period, time_step):
+        time_step = 0.01
+        times = np.arange(0,time_period,time_step)
+        currents = []
+        for i in range(len(times)):
+            cmd = f"motor[{chan}].IqMeas"
+            current_ADC = float(self.send_receive_with_print(cmd))
+            sensor_scaling_factor = 1/1000  # Example scaling factor, adjust as needed
+            current = current_ADC * sensor_scaling_factor
+            currents.append(current)
+            time.sleep(0.01)
+        return currents
+    
+    def current_fetch_in_batch(self, chan):
+        pass
+        self.send_cmd(f"Gather.Enable=0")
+        self.send_cmd(f"Gather.Items=2")
+        self.send_cmd(f"Gather.Period=1")
+        self.send_cmd(f"Gather.MaxSamples=2000")
+
+        self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas")
+        self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas")
+
+        self.send_cmd(f"Gather.Enable=2")
+        time.sleep(1)
+        self.send_cmd(f"Gather.Enable=0")
+        result = self.send_receive_with_print("list gather", delay = 1.0)
+        return result
+
+
+
+
+        
+        
     
 #ppmac = Controller(host="10.23.231.3")
 #ppmac.connect()
