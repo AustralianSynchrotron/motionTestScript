@@ -9,7 +9,7 @@ try:
     controller = Controller(host="10.23.231.3")
     controller.connect()
     time_period = 3
-    time_step = 0.1
+    time_step = 0.01
     time_array = np.arange(0, time_period, time_step)
 
     #move

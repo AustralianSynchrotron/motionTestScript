@@ -253,7 +253,6 @@ class Controller:
         return inpos_state
     
     def current_fetch(self, chan, time_period, time_step):
-        time_step = 0.01
         times = np.arange(0,time_period,time_step)
         currents = []
         for i in range(len(times)):
