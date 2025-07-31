@@ -5,6 +5,8 @@ import paramiko
 import sys
 import select
 import numpy as np
+import panda as pd
+import paramiko.client as client
 
 logger = logging.getLogger(__name__)
 
@@ -277,7 +279,16 @@ class Controller:
         self.send_cmd(f"Gather.Enable=2")
         time.sleep(1)
         self.send_cmd(f"Gather.Enable=0")
-        result = self.send_receive_with_print("list gather", delay = 1.0)
+        result = self.send_receive_with_print("sync gather -u /var/ftp/gather/gatheroutput.txt", delay=2)
+        sftp = client.open_sftp()
+        remote_path = "/var/ftp/gather/gatheroutput.txt"
+        local_path = "gather_output.txt"
+        sftp.get(remote_path, local_path)
+        sftp.close()
+        df = pd.read_csv("gather_output.txt", header=None)
+        df.columns = ["IqMeas", "IaMeas"]
+        print(df.head())
+        
         return result
 
 
