@@ -6,7 +6,7 @@ from time import time
 class OvershootTest(MotionControlTest):
 
     def __init__(self, test_name: str, velocity: float, controller: Controller, distance: float = 10, precision: float = 0.001):
-            super().__init__(test_name, "Overshoot Test")
+            super().__init__(test_name, "Overshoot Test", controller)
             self.precision = precision
             self.distance = distance
             self.velocity = velocity
