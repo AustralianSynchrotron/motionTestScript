@@ -5,7 +5,7 @@ import paramiko
 import sys
 import select
 import numpy as np
-import panda as pd
+import pandas as pd
 import paramiko.client as client
 
 logger = logging.getLogger(__name__)
