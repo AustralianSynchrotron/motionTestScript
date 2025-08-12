@@ -34,7 +34,7 @@ try:
     
     
 except KeyboardInterrupt:
-    controller.graceful_exit(chan=1)
+    controller.graceful_exit(chan=2)
     controller.disconnect()
 
 

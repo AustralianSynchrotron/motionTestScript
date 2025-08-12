@@ -16,8 +16,8 @@ try:
     controller.move_to_pos_wait(chan=2, posn=0)
     controller.move_to_pos(chan=2, posn=20)
 
-    results = controller.current_fetch_in_batch(chan=2)
-    print(results)
+    Ia, Ib = controller.current_fetch_in_batch(chan=2)
+    print(Ia,Ib)
 
     controller.disconnect()
 
