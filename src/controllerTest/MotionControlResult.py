@@ -5,7 +5,7 @@ class MotionControlResult:
     """
 
     def __init__(self, success: bool, test_name: str,
-                 expected_value: float = None, actual_value: float = None, duration: float = None,
+                 expected_value, actual_value, duration: float = None,
                  gathered_data: dict = None):
         self.success = success
 

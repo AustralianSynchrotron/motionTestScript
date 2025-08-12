@@ -1,5 +1,6 @@
 from controllerTest import MotionControlResult, MotionControlTest
 from controller import Controller
+from time import time
 
 class RepeatabilityTest(MotionControlTest):
 
@@ -18,6 +19,7 @@ class RepeatabilityTest(MotionControlTest):
 
         controller = self.controller
 
+        st = time()
         controller.move_to_pos_wait(motor, self.startPosn)
         
         run_results = []
@@ -29,19 +31,25 @@ class RepeatabilityTest(MotionControlTest):
             run_results.append(final_pos)
 
             controller.move_to_pos_wait(motor, self.startPosn)
-        
+        duration = time() - st
 
         # Calculate the average final position
         average_final_pos = sum(run_results) / len(run_results)
         largest_deviation = max(abs(pos - self.endPosn) for pos in run_results)
         # Check if the average final position is within the precision range
-        if abs(average_final_pos - self.endPosn) < self.precision and largest_deviation < self.errorMargin:
-            message = f"Move test passed. Average final position: {average_final_pos}, Largest deviation: {largest_deviation}"
-            result = MotionControlResult(success=True, message=message)
-        else:
-            message = f"Move test failed. Expected: Less than {self.precision}, Actual: {average_final_pos - self.endPosn} with largest deviation {largest_deviation}"
-            result = MotionControlResult(success=False, message=message)
+        success = abs(average_final_pos - self.endPosn) < self.precision and largest_deviation < self.errorMargin
 
-
-        controller.disconnect()
+        result = MotionControlResult(
+            success=success,
+            test_name=self.test_name,
+            expected_value=self.endPosn,
+            actual_value=average_final_pos,
+            duration=duration,  # Duration is not calculated in this test
+            gathered_data={
+                'average_final_pos': average_final_pos,
+                'largest_deviation': largest_deviation,
+                'runs': run_results
+            }
+        )
+        
         return result

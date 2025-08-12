@@ -1,7 +1,7 @@
 from .MotionControlTest import MotionControlTest
 from .MotionControlResult import MotionControlResult
 from controller import Controller
-import time
+from time import time
 
 class OvershootTest(MotionControlTest):
 
@@ -18,6 +18,7 @@ class OvershootTest(MotionControlTest):
         
         controller.set_velocity(motor, self.velocity)
         #start moving
+        st = time()
         controller.move_to_pos(motor, self.distance)
         peak_position = 0
         inpos_state = controller.in_pos(motor)
@@ -26,18 +27,19 @@ class OvershootTest(MotionControlTest):
             peak_position = max(peak_position, pos)
             inpos_state =  controller.in_pos(motor)
             #time.sleep(0.05)
+        duration = time() - st
         # calculate the overshoot
         overshoot = peak_position - self.distance
         
         #move back to 0 position
         controller.move_to_pos_wait(motor, 0)
         
-        
+        success = overshoot <= self.precision
+
+        result = MotionControlResult(success=success,
+                                     test_name=self.test_name, expected_value="<= " + str(self.precision),
+                                     actual_value=overshoot, duration=duration)
         #check if the overshoot is within the precision
-        if overshoot > self.precision:
-            result = MotionControlResult(success=False, message=f"Overshoot test failed at speed {self.velocity}. Overshoot: {overshoot}")
-        else:
-            result = MotionControlResult(success=True, message=f"Overshoot test passed at speed {self.velocity}. Overshoot: {overshoot}")
                 
         return result
         

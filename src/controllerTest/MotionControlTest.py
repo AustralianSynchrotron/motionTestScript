@@ -32,10 +32,7 @@ class MotionControlTest(ABC):
                 elapsed = time.time() - start_time
                 print(f"Test '{self.test_name}' timed out after {elapsed:.2f} seconds.")
                 # Attempt to stop current command, if supported.
-                if hasattr(self.controller, "stop_command"):
-                    self.controller.stop_command()
-                else:
-                    self.controller.disconnect()
+                self.controller.graceful_exit(motor)
                 # Return a failed MotionControlResult.
                 return MotionControlResult(
                     success=False,

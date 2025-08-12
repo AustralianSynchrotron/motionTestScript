@@ -28,5 +28,4 @@ class MoveTestAbsolute(MotionControlTest):
                                      test_name=self.test_name, expected_value=self.posn,
                                      actual_value=final_pos, duration=duration)
 
-        controller.disconnect()
         return result
