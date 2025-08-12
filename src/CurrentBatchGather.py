@@ -13,15 +13,15 @@ try:
     currents = []
 
     #move
-    controller.move_to_pos_wait(chan=1, posn=0)
-    controller.move_to_pos(chan=1, posn=20)
+    controller.move_to_pos_wait(chan=2, posn=0)
+    controller.move_to_pos(chan=2, posn=20)
 
-    results = controller.current_fetch_in_batch(chan=1)
+    results = controller.current_fetch_in_batch(chan=2)
     print(results)
 
     controller.disconnect()
 
 
 except KeyboardInterrupt:
-    controller.graceful_exit(chan=1)
+    controller.graceful_exit(chan=2)
     controller.disconnect()

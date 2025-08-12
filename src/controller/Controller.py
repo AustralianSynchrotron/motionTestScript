@@ -5,7 +5,7 @@ import paramiko
 import sys
 import select
 import numpy as np
-import panda as pd
+import pandas as pd
 import paramiko.client as client
 
 logger = logging.getLogger(__name__)
@@ -273,19 +273,19 @@ class Controller:
         self.send_cmd(f"Gather.Period=1")
         self.send_cmd(f"Gather.MaxSamples=2000")
 
-        self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas")
-        self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas")
+        #self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas")
+        #self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas")
 
         self.send_cmd(f"Gather.Enable=2")
         time.sleep(1)
         self.send_cmd(f"Gather.Enable=0")
-        result = self.send_receive_with_print("sync gather -u /var/ftp/gather/gatheroutput.txt", delay=2)
-        sftp = client.open_sftp()
+        result = self.send_receive_with_print("gather -u /var/ftp/gather/gatheroutput.txt")
+        sftp = self.session.open_sftp()
         remote_path = "/var/ftp/gather/gatheroutput.txt"
-        local_path = "gather_output.txt"
+        local_path = "./gatheroutput.txt"
         sftp.get(remote_path, local_path)
         sftp.close()
-        df = pd.read_csv("gather_output.txt", header=None)
+        df = pd.read_csv("./gatheroutput.txt", header=None)
         df.columns = ["IqMeas", "IaMeas"]
         print(df.head())
         
