@@ -114,7 +114,16 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+
+    controller = Controller(host="10.23.231.3")
+    controller.connect()
+    motor = 2
+    encoder = 10
+
+    absMoveTestMacro = MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=15, controller=controller,precision=0.001)
+        absMoveTestMacroResult = absMoveTestMacro.execute(motor, encoder)
+    
 
     # Example usage:
     #results = [
