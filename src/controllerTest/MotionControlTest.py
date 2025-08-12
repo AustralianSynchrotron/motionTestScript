@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from controller import Controller
 import time
 import concurrent.futures
-from controllerTest import MotionControlResult
+from controllerTest.MotionControlResult import MotionControlResult
 
 class MotionControlTest(ABC):
     """
@@ -34,13 +34,14 @@ class MotionControlTest(ABC):
                 # Attempt to stop current command, if supported.
                 self.controller.graceful_exit(motor)
                 # Return a failed MotionControlResult.
-                return MotionControlResult(
+                result = MotionControlResult(
                     success=False,
                     test_name=self.test_name,
                     expected_value=None,
                     actual_value=None,
                     duration=elapsed
                 )
+                return result
 
     @abstractmethod
     def execute(self, motor: int, encoder: int):

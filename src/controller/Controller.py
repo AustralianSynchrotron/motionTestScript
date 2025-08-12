@@ -291,6 +291,11 @@ class Controller:
         
         return result
 
+    def graceful_exit(self, chan):
+        self.send_cmd(f"#{chan}k")
+        self.send_cmd(f"#{chan}$")
+        self.send_cmd(f"#{chan}j/")
+
 
 
 
