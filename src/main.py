@@ -1,5 +1,6 @@
-from controllerTest import MoveTestAbsolute, VelocityTest, LimitTest, RepeatabilityTest, OvershootTest
+from controllerTest import MoveTestAbsolute, VelocityTest, LimitTest, RepeatabilityTest, OvershootTest, MotionControlResult
 from controller import Controller
+from report import ReportGenerator
 
 def main():
     """
@@ -95,4 +96,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+
+    # Example usage:
+    results = [
+        MotionControlResult(success=True, test_name="Move Test 1", expected_value=10.0, actual_value=10.0, duration=0.5),
+        MotionControlResult(success=False, test_name="Move Test 2", expected_value=20.0, actual_value=19.5, duration=0.6, gathered_data={"current": [0.1, 0.2, 0.3], "volage": [1.0, 1.1, 1.2]})
+    ]
+
+    report_generator = ReportGenerator(results)
+    report_generator.generate_report("motion_control_report.txt")
