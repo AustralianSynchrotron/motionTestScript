@@ -1,6 +1,6 @@
 from controllerTest import MotionControlResult, MotionControlTest
 from controller import Controller
-from time import time
+from time import time, sleep
 
 class VelocityTest(MotionControlTest):
 
@@ -20,7 +20,7 @@ class VelocityTest(MotionControlTest):
         controller.move_to_end_pos_wait(motor)
         controller.set_velocity(motor, self.velocity)
         controller.move_to_end_neg(motor)
-        time.sleep(2)
+        sleep(2)
         vol = controller.get_velocity(encoder)
         duration = time() - st
 
@@ -36,5 +36,5 @@ class VelocityTest(MotionControlTest):
                 'velocity': vol
             }
         )
-        
+
         return result
