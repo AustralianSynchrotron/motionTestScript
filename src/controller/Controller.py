@@ -268,39 +268,41 @@ class Controller:
     
     def current_fetch_in_batch(self, chan):
         pass
-        self.send_cmd(f"Gather.Enable=0")
-        self.send_cmd(f"Gather.Items=2")
-        self.send_cmd(f"Gather.Period=1")
-        self.send_cmd(f"Gather.MaxSamples=2000")
+        self.send_receive_with_print(f"Gather.Enable=0")
+        self.send_receive_with_print(f"Gather.Items=1")
+        #self.send_cmd(f"Gather.Period=1")
+        #self.send_cmd(f"Gather.MaxSamples=2000")
+        self.send_receive_with_print(f"Gather.Addr[0] = Motor[{chan}].IqCmd.a")
+        #self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas.a")
+        #self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas.a")
 
-        #self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas")
-        #self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas")
-
-        self.send_cmd(f"Gather.Enable=2")
-        self.send_cmd(f"Gather.Enable=1")
+        self.send_receive_with_print(f"Gather.Enable=3")
+        stdin, stdout, stderr = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt")
+        print(stdin, stdout, stderr)
+        self.move_to_pos_wait(2, 10)
         
         #potentially need to move the robot here
         
-        time.sleep(1)
-        self.send_cmd(f"Gather.Enable=0")
+        time.sleep(10)
+        self.send_receive_with_print(f"Gather.Enable=0")
         
         
         
-        result = self.send_receive_with_print("gather /var/ftp/gather/gatheroutput.txt")
+        #result = self.send_receive_with_print("save gather /var/ftp/gather/gatheroutput.txt")
         #try gather /var/ftp/gather/gatheroutput.txt
         #try save gather
         
         #download the data
         sftp_dataget = self.session.open_sftp()
-        sftp_dataget.get("/var/ftp/gather/gatheroutput.txt", "gather_output.txt")
+        sftp_dataget.get("/var/ftp/gather/python_script.txt", "gather_output.txt")
         sftp_dataget.close()
         
         #read the data
-        df = pd.read_csv("gather_output.txt", delim_whitespace=True, header=None)
-        df.columns = ["IqMeas", "IaMeas"]
-        print(df.head())
+        #df = pd.read_csv("gather_output.txt", delim_whitespace=True, header=None)
+        #df.columns = ["IqMeas", "IaMeas"]
+        #print(df.head())
         
-        return df["IaMeas"].to_numpy(), df["IbMeas"].to_numpy()
+        #return df["IaMeas"].to_numpy(), df["IbMeas"].to_numpy()
 
 
 

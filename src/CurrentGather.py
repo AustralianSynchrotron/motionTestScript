@@ -14,11 +14,11 @@ try:
 
     #move
     #reset postion
-    controller.move_to_pos_wait(chan=1, posn=0)
+    controller.move_to_pos_wait(chan=2, posn=0)
     #move the stage
-    controller.move_to_pos(chan=1, posn=20)
+    controller.move_to_pos(chan=2, posn=20)
 
-    currents = controller.current_fetch(chan=1, time_period=time_period, time_step=time_step)
+    currents = controller.current_fetch(chan=2, time_period=time_period, time_step=time_step)
     print(currents)
 
     controller.disconnect()
