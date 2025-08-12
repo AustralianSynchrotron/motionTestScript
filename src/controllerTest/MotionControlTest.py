@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from controller import Controller
 import time
 import concurrent.futures
-import MotionControlResult
+from controllerTest import MotionControlResult
 
 class MotionControlTest(ABC):
     """
