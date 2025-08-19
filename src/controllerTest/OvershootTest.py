@@ -21,6 +21,7 @@ class OvershootTest(MotionControlTest):
         controller.move_to_pos(motor, self.distance)
         peak_position = 0
         inpos_state = controller.in_pos(motor)
+        controller.start_gather(chan=motor, max_sample=5000, meas_item=["IaMeas.a", "IbMeas.a"])
         while (inpos_state) != 1:
             pos = controller.get_pos(encoder)
             peak_position = max(peak_position, pos)

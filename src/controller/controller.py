@@ -254,6 +254,7 @@ class Controller:
         inpos_state = int(self.send_receive_with_print(cmd))
         return inpos_state
     
+    """
     def current_fetch(self, chan, time_period, time_step):
         times = np.arange(0,time_period,time_step)
         currents = []
@@ -265,44 +266,47 @@ class Controller:
             currents.append(current)
             time.sleep(0.01)
         return currents
-    
-    def current_fetch_in_batch(self, chan):
-        pass
+    """
+
+    def start_gather(self, chan, max_sample, meas_item=[]):
+        num_items = len(meas_item)
+        #setting up the gather command
         self.send_receive_with_print(f"Gather.Enable=0")
-        self.send_receive_with_print(f"Gather.Items=1")
-        #self.send_cmd(f"Gather.Period=1")
-        #self.send_cmd(f"Gather.MaxSamples=2000")
-        self.send_receive_with_print(f"Gather.Addr[0] = Motor[{chan}].IqCmd.a")
-        #self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas.a")
-        #self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas.a")
+        self.send_receive_with_print(f"Gather.Items={num_items}")
+        
+        self.send_cmd(f"Gather.Period=1")
+        self.send_cmd(f"Gather.MaxSamples={max_sample}")
+
+        for i in range(num_items):
+            self.send_receive_with_print(f"Gather.Addr[{i}] = Motor[{chan}].{meas_item[i]}")
 
         self.send_receive_with_print(f"Gather.Enable=3")
         stdin, stdout, stderr = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt")
-        print(stdin, stdout, stderr)
-        self.move_to_pos_wait(2, 10)
-        
-        #potentially need to move the robot here
-        
-        time.sleep(10)
+
+
+    def end_gather(self, save_to_filename = "gather_output.txt", meas_item=[], as_tuple=False):
+        #stop recording
+        time.sleep(3)
         self.send_receive_with_print(f"Gather.Enable=0")
         
-        
-        
-        #result = self.send_receive_with_print("save gather /var/ftp/gather/gatheroutput.txt")
-        #try gather /var/ftp/gather/gatheroutput.txt
-        #try save gather
-        
-        #download the data
+        #saving the data into file
         sftp_dataget = self.session.open_sftp()
-        sftp_dataget.get("/var/ftp/gather/python_script.txt", "gather_output.txt")
+        sftp_dataget.get("/var/ftp/gather/python_script.txt", save_to_filename)
         sftp_dataget.close()
         
-        #read the data
-        #df = pd.read_csv("gather_output.txt", delim_whitespace=True, header=None)
-        #df.columns = ["IqMeas", "IaMeas"]
-        #print(df.head())
+        #read data
+        df = pd.read_csv(save_to_filename, delim_whitespace=True, header=None)
+        if len(df.columns) != len(meas_item):
+            raise ValueError(f"Expected {len(meas_item)} columns, got {len(df.columns)}")
+        df.columns = meas_item
         
-        #return df["IaMeas"].to_numpy(), df["IbMeas"].to_numpy()
+        if as_tuple:
+            return tuple(df[col] for col in df.columns)
+        
+        return df
+        
+        
+
 
 
 

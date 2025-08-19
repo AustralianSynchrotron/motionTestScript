@@ -20,7 +20,10 @@ class VelocityTest(MotionControlTest):
         controller.set_velocity(motor, self.velocity)
         controller.move_to_end_neg(motor)
         time.sleep(2)
-        vol = controller.get_velocity(encoder)
+        controller.start_gather(chan=motor, max_sample=5000, meas_item=[f"Motor[{motor}].ActVel"])
+        vol = controller.end_gather(save_to_filename="velocity_output.txt", meas_item=[f"Motor[{motor}].ActVel"], as_tuple=False)
+        vol = sum(vol)/ len(vol)  # Average the velocity over the samples
+        #vol = controller.get_velocity(encoder)
 
 
         
