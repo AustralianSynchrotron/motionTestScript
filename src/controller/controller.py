@@ -193,10 +193,10 @@ class Controller:
         return response
     
     def wait_till_done(self, chan):
+        
         cmd = f"motor[{chan}].inpos"
         inpos_state = int(self.send_receive_with_print(cmd))
-        #print("Waiting Till Done")
-        while (inpos_state) != 1:
+        while inpos_state != 1:
             inpos_state = int(self.send_receive_with_print(cmd))
             time.sleep(0.1)
         #print("DONE!")
@@ -274,19 +274,29 @@ class Controller:
         self.send_receive_with_print(f"Gather.Enable=0")
         self.send_receive_with_print(f"Gather.Items={num_items}")
         
-        self.send_cmd(f"Gather.Period=1")
-        self.send_cmd(f"Gather.MaxSamples={max_sample}")
+        # self.send_cmd(f"Gather.Period=1")
+        # self.send_cmd(f"Gather.MaxSamples={max_sample}")
 
         for i in range(num_items):
             self.send_receive_with_print(f"Gather.Addr[{i}] = Motor[{chan}].{meas_item[i]}")
 
         self.send_receive_with_print(f"Gather.Enable=3")
-        stdin, stdout, stderr = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt")
+        stdin, stdout, stderr = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt", get_pty=True)
+
+        print(stdin, stdout, stderr)
+
+        time.sleep(20)
+
+        # self.move_to_pos_wait(2,10)
+        # time.sleep(10)
+        # self.send_receive_with_print(f"Gather.Enable=0")
+        # sftp_dataget = self.session.open_sftp()
+        # sftp_dataget.get("/var/ftp/gather/python_script.txt", "current_output")
 
 
     def end_gather(self, save_to_filename = "gather_output.txt", meas_item=[], as_tuple=False):
         #stop recording
-        time.sleep(3)
+        time.sleep(10)
         self.send_receive_with_print(f"Gather.Enable=0")
         
         #saving the data into file

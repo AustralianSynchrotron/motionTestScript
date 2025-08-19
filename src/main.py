@@ -1,4 +1,4 @@
-from controllerTest import MoveTestAbsolute, VelocityTest, LimitTest, RepeatabilityTest, OvershootTest
+from controllerTest import MoveTestAbsolute, VelocityTest, LimitTest, RepeatabilityTest, OvershootTest, CurrentGather
 from controller import Controller
 
 def main():
@@ -11,6 +11,12 @@ def main():
         controller = Controller(host="10.23.231.3")
         controller.connect()
 
+        currentTest = CurrentGather("Current test", controller=controller)
+        currentTest.execute(motor=2,encoder=10)
+    
+
+
+        """
         absMoveTestMicro = MoveTestAbsolute(test_name="Absolute Move Test Micro", posn=10.005, controller=controller, precision=0.001)
         absMoveTestMicroResult = absMoveTestMicro.execute(motor=1, encoder=9)
         print(absMoveTestMicroResult)
@@ -62,7 +68,7 @@ def main():
         velocityTestFast = VelocityTest(test_name="Velocity Test Fast", velocity=0.004, controller=controller, precision=0.001)
         velocityTestFastResult = velocityTestFast.execute(motor=1, encoder=9)
         print(velocityTestFastResult)
-
+        """
 
 
         # # Example usage
