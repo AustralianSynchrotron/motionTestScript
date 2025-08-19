@@ -121,9 +121,12 @@ if __name__ == "__main__":
     motor = 2
     encoder = 10
 
-    absMoveTestMacro = MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=0, controller=controller,precision=0.001)
-    absMoveTestMacroResult = absMoveTestMacro.timeout_execution(motor, encoder, 2)
-    print(absMoveTestMacroResult)
+    intialised = controller.initialise(chan=motor)
+    print(f"Controller initialised: {intialised}")
+
+    #absMoveTestMacro = MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=0, controller=controller,precision=0.001)
+    #absMoveTestMacroResult = absMoveTestMacro.timeout_execution(motor, encoder, 2)
+    #print(absMoveTestMacroResult)
     
 
     # Example usage:

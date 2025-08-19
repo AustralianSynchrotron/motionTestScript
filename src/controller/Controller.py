@@ -293,6 +293,32 @@ class Controller:
 
     def graceful_exit(self, chan):
         self.send_cmd(f"#{chan}k")
+        self.phase(chan)
+
+    def initialise(self, chan):
+        try: 
+            self.phase(chan)
+
+            self.move_to_end_neg_wait
+            neg_pos = self.get_pos(chan)
+            self.move_to_end_pos_wait
+            pos_pos = self.get_pos(chan)
+
+            middle_pos = (neg_pos + pos_pos) / 2
+            self.move_to_pos_wait(chan, middle_pos)
+
+            self.home(chan)
+
+            return True
+        
+        except Exception as e:
+            print(f"Error during initialisation: {e}")
+            return False
+
+    def home(self, chan):
+        self.send_cmd(f"#{chan}homez")
+
+    def phase(self, chan):
         self.send_cmd(f"#{chan}$")
         self.send_cmd(f"#{chan}j/")
 
