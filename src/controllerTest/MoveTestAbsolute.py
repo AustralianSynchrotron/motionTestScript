@@ -1,5 +1,6 @@
 from controllerTest import MotionControlResult, MotionControlTest
 from controller import Controller
+from time import time
 
 class MoveTestAbsolute(MotionControlTest):
 
@@ -16,15 +17,15 @@ class MoveTestAbsolute(MotionControlTest):
         controller = self.controller
         initial_pos = controller.get_pos(encoder)
 
+        st = time()
         controller.move_to_pos_wait(motor, self.posn)
-
         final_pos = controller.get_pos(encoder)
+        duration = time() - st
 
-        if abs(final_pos - self.posn) < self.precision:
-            result = MotionControlResult(success=True, message="Move test passed.")
-        else:
-            message = f"Move test failed. Expected: {self.posn}, Actual: {final_pos}"
-            result = MotionControlResult(success=False, message=message)
+        success = abs(final_pos - self.posn) < self.precision
 
-        controller.disconnect()
+        result = MotionControlResult(success=success,
+                                     test_name=self.test_name, expected_value=self.posn,
+                                     actual_value=final_pos, duration=duration)
+
         return result
