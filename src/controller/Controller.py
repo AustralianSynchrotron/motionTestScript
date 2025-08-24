@@ -309,10 +309,11 @@ class Controller:
     def initialise(self, chan):
         try: 
             self.phase(chan)
+            time.sleep(1)
 
-            self.move_to_end_neg_wait
+            self.move_to_end_neg_wait(chan)
             neg_pos = self.get_pos(chan)
-            self.move_to_end_pos_wait
+            self.move_to_end_pos_wait(chan)
             pos_pos = self.get_pos(chan)
 
             middle_pos = (neg_pos + pos_pos) / 2
