@@ -281,11 +281,12 @@ class Controller:
             self.send_receive_with_print(f"Gather.Addr[{i}] = Motor[{chan}].{meas_item[i]}")
 
         self.send_receive_with_print(f"Gather.Enable=3")
-        stdin, stdout, stderr = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt", get_pty=True)
+        channel = self.session.invoke_shell()
+        stdin, stdout, stderr = channel.exec_command(f"gather /var/ftp/gather/python_script.txt")
 
         print(stdin, stdout, stderr)
 
-        time.sleep(20)
+        #time.sleep(20)
 
         # self.move_to_pos_wait(2,10)
         # time.sleep(10)
