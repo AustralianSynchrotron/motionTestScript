@@ -22,15 +22,15 @@ class CurrentGather(MotionControlTest):
         thread = threading.Thread(target=controller.start_gather, args=(motor, 2000, ["IqCmd.a"]))
         thread.start()
 
-        time.sleep(2)
+        time.sleep(5)
         # Move robot
         controller.move_to_pos_wait(chan=motor, posn=10)
         # End gather
-        i_a, i_b = controller.end_gather(save_to_filename = "current_output.txt",meas_item=["IqCmd.a"],as_tuple=True)
+        i_a = controller.end_gather(save_to_filename = "current_output.txt",meas_item=["IqCmd.a"],as_tuple=True)
 
         # Plot the data
         plt.plot(i_a, label="Ia")
-        plt.plot(i_b, label="Ib")
+        #plt.plot(i_b, label="Ib")
         plt.legend()
         plt.show()
 

@@ -272,7 +272,6 @@ class Controller:
         num_items = len(meas_item)
         #setting up the gather command
         self.send_receive_with_print(f"Gather.Enable=0")
-        self.send_receive_with_print(f"Gather.Items={num_items}")
         
         # self.send_cmd(f"Gather.Period=1")
         # self.send_cmd(f"Gather.MaxSamples={max_sample}")
@@ -280,12 +279,15 @@ class Controller:
         for i in range(num_items):
             self.send_receive_with_print(f"Gather.Addr[{i}] = Motor[{chan}].{meas_item[i]}")
 
+        self.send_receive_with_print(f"Gather.Items={num_items}")
+
         self.send_receive_with_print(f"Gather.Enable=3")
-        channel = self.session.invoke_shell()
-        stdin, stdout, stderr = channel.exec_command(f"gather /var/ftp/gather/python_script.txt")
+        #channel = self.session.invoke_shell(term='xterm')
+        _, stdout, _ = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt", get_pty=True)
 
-        print(stdin, stdout, stderr)
+        stdout.channel.recv_exit_status()
 
+        print("Thread closing")
         #time.sleep(20)
 
         # self.move_to_pos_wait(2,10)
@@ -299,7 +301,7 @@ class Controller:
         #stop recording
         time.sleep(10)
         self.send_receive_with_print(f"Gather.Enable=0")
-        
+        time.sleep(10)
         #saving the data into file
         sftp_dataget = self.session.open_sftp()
         sftp_dataget.get("/var/ftp/gather/python_script.txt", save_to_filename)
