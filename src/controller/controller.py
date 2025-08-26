@@ -273,7 +273,7 @@ class Controller:
         #setting up the gather command
         self.send_receive_with_print(f"Gather.Enable=0")
         
-        # self.send_cmd(f"Gather.Period=1")
+        self.send_receive_with_print(f"Gather.Period=1")
         # self.send_cmd(f"Gather.MaxSamples={max_sample}")
 
         for i in range(num_items):
@@ -285,7 +285,8 @@ class Controller:
         #channel = self.session.invoke_shell(term='xterm')
         _, stdout, _ = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt", get_pty=True)
 
-        stdout.channel.recv_exit_status()
+
+        stdout.read()
 
         print("Thread closing")
         #time.sleep(20)

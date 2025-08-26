@@ -26,12 +26,15 @@ class CurrentGather(MotionControlTest):
         # Move robot
         controller.move_to_pos_wait(chan=motor, posn=10)
         # End gather
-        i_a = controller.end_gather(save_to_filename = "current_output.txt",meas_item=["IqCmd.a"],as_tuple=True)
-
+        i_a = controller.end_gather(save_to_filename = "current_output.txt",meas_item=["IqCmd.a"],as_tuple=False)
+        #i_a = i_a[0]
+        print(len(i_a))
+        print(type(i_a))
+        print(i_a[0:100])
         # Plot the data
-        plt.plot(i_a, label="Ia")
+        times = np.linspace(0,len(i_a),len(i_a))
+        plt.plot(times, i_a)
         #plt.plot(i_b, label="Ib")
-        plt.legend()
         plt.show()
 
         controller.disconnect()
