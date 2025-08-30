@@ -4,9 +4,9 @@ from time import time
 
 class MoveTestAbsolute(MotionControlTest):
 
-    def __init__(self, test_name: str, posn: float, controller: Controller, precision: float = 0.01):
-        super().__init__(test_name, "Absolute Move Test", controller)
-        self.posn = posn
+    def __init__(self, test_name: str, posn_add: float, controller: Controller, precision: float = 0.01):
+        super().__init__(test_name, "Relative Move Test", controller)
+        self.posn_add = posn_add
         self.precision = precision
 
     def execute(self, motor: int, encoder: int):
@@ -16,16 +16,17 @@ class MoveTestAbsolute(MotionControlTest):
 
         controller = self.controller
         initial_pos = controller.get_pos(encoder)
+        expected_pos = initial_pos + self.posn_add
 
         st = time()
-        controller.move_to_pos_wait(motor, self.posn)
+        controller.move_to_pos_wait(motor, self.posn_add)
         final_pos = controller.get_pos(encoder)
         duration = time() - st
 
-        success = abs(final_pos - self.posn) < self.precision
+        success = abs(expected_pos - final_pos) < self.precision
 
         result = MotionControlResult(success=success,
-                                     test_name=self.test_name, expected_value=self.posn,
-                                     actual_value=final_pos, duration=duration)
+                                     test_name=self.test_name, expected_value=self.posn_add,
+                                     actual_value=final_pos-initial_pos, duration=duration)
 
         return result
