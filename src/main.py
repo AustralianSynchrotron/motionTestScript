@@ -15,8 +15,8 @@ def main():
         motor = 2
         encoder = 10
 
-        currentTest = CurrentGather("Current test", controller=controller)
-        currentTest.execute(motor=2,encoder=10)
+        #currentTest = CurrentGather("Current test", controller=controller)
+        #currentTest.execute(motor=2,encoder=10)
     
 
 

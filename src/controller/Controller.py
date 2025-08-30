@@ -268,7 +268,7 @@ class Controller:
         return currents
     """
 
-    def start_gather(self, chan, max_sample, meas_item=[]):
+    def start_gather(self, chan, test_id, meas_item=[]):
         num_items = len(meas_item)
         #setting up the gather command
         self.send_receive_with_print(f"Gather.Enable=0")
@@ -309,15 +309,15 @@ class Controller:
         sftp_dataget.close()
         
         #read data
-        df = pd.read_csv(save_to_filename, delim_whitespace=True, header=None)
-        if len(df.columns) != len(meas_item):
-            raise ValueError(f"Expected {len(meas_item)} columns, got {len(df.columns)}")
-        df.columns = meas_item
+        #df = pd.read_csv(save_to_filename, delim_whitespace=True, header=None)
+        #if len(df.columns) != len(meas_item):
+        #    raise ValueError(f"Expected {len(meas_item)} columns, got {len(df.columns)}")
+        #df.columns = meas_item
+        #
+        #if as_tuple:
+        #    return tuple(df[col] for col in df.columns)
         
-        if as_tuple:
-            return tuple(df[col] for col in df.columns)
-        
-        return df
+        #return df
         
 
     def graceful_exit(self, chan):

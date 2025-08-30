@@ -3,6 +3,7 @@ from controller import Controller
 import time
 import concurrent.futures
 from controllerTest.MotionControlResult import MotionControlResult
+import uuid
 
 class MotionControlTest(ABC):
     """
@@ -10,14 +11,18 @@ class MotionControlTest(ABC):
     """
 
     def __init__(self, test_name: str, generic_name: str, controller: Controller):
+        self.id = str(uuid.uuid4())
         self.test_name = test_name
         self.generic_name = generic_name
         self.controller = controller
 
-    def timeout_execution(self, motor: int, encoder: int, timeout: float = 60.0):
+    def main_execution(self, motor: int, encoder: int, timeout: float = 60.0, gather_data: bool = False, measure_item: list = None):
         """
         Execute the test with a timeout.
         """
+
+        if gather_data:
+            self.controller.start_gather(chan=motor, test_id=self.id, meas_item=measure_item)
         
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
@@ -27,7 +32,6 @@ class MotionControlTest(ABC):
                 result = future.result(timeout=timeout)
                 elapsed = time.time() - start_time
                 print(f"Test '{self.test_name}' completed in {elapsed:.2f} seconds.")
-                return result
             except concurrent.futures.TimeoutError:
                 elapsed = time.time() - start_time
                 print(f"Test '{self.test_name}' timed out after {elapsed:.2f} seconds.")
@@ -41,6 +45,12 @@ class MotionControlTest(ABC):
                     actual_value=None,
                     duration=elapsed
                 )
+            finally:
+                if gather_data:
+                    gathered_data = self.controller.end_gather(save_to_filename=f"{self.id}_output.txt", meas_item=measure_item, as_tuple=True)
+                    if result.gathered_data is None:
+                        result.gathered_data = {}
+                    result.gathered_data.update(gathered_data)
                 return result
 
     @abstractmethod
