@@ -15,9 +15,20 @@ def main():
         motor = 2
         encoder = 10
 
+
+        # absMoveTestMacro = MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=-50, controller=controller,precision=0.001)
+        # absMoveTestMacroResult = absMoveTestMacro.main_execution(motor, encoder, 60, True, ["IqCmd.a", "Pos.a"])
+        # #absMoveTestMacroResult = absMoveTestMacro.execute(motor, encoder)
+        # print(absMoveTestMacroResult)
+        # results.append(absMoveTestMacroResult)
+
         #currentTest = CurrentGather("Current test", controller=controller)
         #currentTest.execute(motor=2,encoder=10)
-    
+
+        limitTest = LimitTest(test_name="Limit Test", controller=controller)
+        limitTestResult = limitTest.main_execution(motor, encoder,120,True,["Pos.a", "Pos.a"])
+        print(limitTestResult)
+        results.append(limitTestResult)
 
 
         """
@@ -117,8 +128,9 @@ def main():
 
 
 if __name__ == "__main__":
-    #main()
+    main()
 
+    """
     controller = Controller(host="10.23.231.3")
     controller.connect()
     motor = 2
@@ -126,7 +138,7 @@ if __name__ == "__main__":
 
     intialised = controller.initialise(chan=motor)
     print(f"Controller initialised: {intialised}")
-
+    """
     #absMoveTestMacro = MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=0, controller=controller,precision=0.001)
     #absMoveTestMacroResult = absMoveTestMacro.timeout_execution(motor, encoder, 2)
     #print(absMoveTestMacroResult)

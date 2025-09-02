@@ -14,6 +14,7 @@ class LimitTest(MotionControlTest):
         
         #set speed to max speed
         max_speed = controller.get_maximum_velocity(motor)
+        print(max_speed)
         controller.set_velocity(motor, max_speed)
 
         #back off in case it is on the switch already

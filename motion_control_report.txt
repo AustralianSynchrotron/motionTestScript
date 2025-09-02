@@ -1,95 +1,18 @@
 Motion Control Test Report
 ==========================
 
-Test Name: Absolute Move Test Micro
+Test Name: Move Test 1
 Success: True
-Expected Value: 10.005
-Actual Value: 10.006
-Test Duration: 4.004 seconds
+Expected Value: 10.0
+Actual Value: 10.0
+Test Duration: 0.500 seconds
 Gathered Data: {}
 -------------------------------
-Test Name: Absolute Move Test Macro
-Success: True
-Expected Value: 15
-Actual Value: 14.999998046875
-Test Duration: 5.460 seconds
-Gathered Data: {}
--------------------------------
-Test Name: Absolute Move Test Macro Precise
-Success: True
-Expected Value: 25.005
-Actual Value: 25.005498046875
-Test Duration: 10.402 seconds
-Gathered Data: {}
--------------------------------
-Test Name: Repeatability Test Micro
-Success: True
-Expected Value: 10.005
-Actual Value: 10.005331640625
-Test Duration: 27.713 seconds
-Gathered Data: {'average_final_pos': 10.005331640625, 'largest_deviation': 0.0004980468749984368, 'runs': [10.005498046875, 10.005498046875, 10.005498046875, 10.00525, 10.00525, 10.00525, 10.00525, 10.00525, 10.00525, 10.005322265625]}
--------------------------------
-Test Name: Repeatability Test Macro
-Success: True
-Expected Value: 20
-Actual Value: 19.999998046875
-Test Duration: 208.623 seconds
-Gathered Data: {'average_final_pos': 19.999998046875, 'largest_deviation': 1.953125000397904e-06, 'runs': [19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875, 19.999998046875]}
--------------------------------
-Test Name: Repeatability Test Micro Large
-Success: True
-Expected Value: 20.005
-Actual Value: 20.005498046875
-Test Duration: 209.759 seconds
-Gathered Data: {'average_final_pos': 20.005498046875, 'largest_deviation': 0.0004980468750019895, 'runs': [20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875, 20.005498046875]}
--------------------------------
-Test Name: Limit Test
-Success: 1
-Expected Value: Both limits should be reached
-Actual Value: Positive: 1, Negative: 1
-Test Duration: 230.648 seconds
-Gathered Data: {'positive_end_limit': 1, 'negative_end_limit': 1}
--------------------------------
-Test Name: Overshoot Test Slow
+Test Name: Move Test 2
 Success: False
-Expected Value: <= 0.001
-Actual Value: 70.244125
-Test Duration: 70.516 seconds
-Gathered Data: {}
--------------------------------
-Test Name: Overshoot Test Medium
-Success: True
-Expected Value: <= 0.001
-Actual Value: -0.0014374999999997584
-Test Duration: 4.261 seconds
-Gathered Data: {}
--------------------------------
-Test Name: Overshoot Test Fast
-Success: True
-Expected Value: <= 0.001
-Actual Value: 0.0009980468750008242
-Test Duration: 2.887 seconds
-Gathered Data: {}
--------------------------------
-Test Name: Velocity Test Slow
-Success: True
-Expected Value: Velocity should be within 0.001 of 0.001
-Actual Value: -0.001243429251189994
-Test Duration: 23.565 seconds
-Gathered Data: {'velocity': -0.001243429251189994}
--------------------------------
-Test Name: Velocity Test Medium
-Success: True
-Expected Value: Velocity should be within 0.001 of 0.0025
-Actual Value: -0.002465129618942569
-Test Duration: 5.375 seconds
-Gathered Data: {'velocity': -0.002465129618942569}
--------------------------------
-Test Name: Velocity Test Fast
-Success: True
-Expected Value: Velocity should be within 0.001 of 0.004
-Actual Value: -0.003993475802416484
-Test Duration: 5.532 seconds
-Gathered Data: {'velocity': -0.003993475802416484}
+Expected Value: 20.0
+Actual Value: 19.5
+Test Duration: 0.600 seconds
+Gathered Data: {'current': [0.1, 0.2, 0.3]}
 -------------------------------
 End of Report

@@ -7,6 +7,7 @@ import uuid
 import numpy as np
 import matplotlib.pyplot as plt
 import threading
+import pandas as pd
 
 class MotionControlTest(ABC):
     """
@@ -28,6 +29,7 @@ class MotionControlTest(ABC):
             print("Starting data gather...")
             thread = threading.Thread(target=self.controller.start_gather, args=(motor, self.id, measure_item))
             thread.start()
+            time.sleep(1)
         
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
@@ -55,28 +57,42 @@ class MotionControlTest(ABC):
                 if gather_data:
                     print("Ending data gather...")
                     self.controller.end_gather(self.id)
-                    #self.visualise_gather_data(gathered_data, self.test_name, f"{self.id}_output.txt", measure_item)
+                    
+                    self.visualise_gather_data(self.id, self.test_name, f"{self.id}_graph_output", measure_item)
                 return result
 
-    def visualise_gather_data(self, data, title, path, measure_item):
-    
+    def visualise_gather_data(self, id, title, path, meas_item):
+        
+        #read data
+        df = pd.read_csv(f"gather_output_{id}.txt", delim_whitespace=True, header=None)
+        if len(df.columns) != len(meas_item):
+           raise ValueError(f"Expected {len(meas_item)} columns, got {len(df.columns)}")
+        df.columns = meas_item
+        
+
+        if len(meas_item) > 1:
+           data = tuple(df[col] for col in df.columns)
+        else:
+            data = tuple(df)
+
         if data is None:
             return None
-        times = np.arange(len(data))
+        
+        times = np.arange(len(data[0]))
         fig = plt.figure()
-        for col in data.columns:
-            plt.plot(times, data[col], label=str(col))
-        #labels
-        plt.xlabel("Timestep")
-        # Y label from measure_item
-        if measure_item:
-            ylabel = measure_item[0] if len(measure_item) == 1 else "Value (" + ", ".join(measure_item) + ")"
-        else:
-            ylabel = "Value" if len(data.columns) > 1 else str(data.columns[0])
-        plt.ylabel(ylabel)
-        if title:
-            plt.title(title)
-        plt.legend()
+        for i in range(len(data)):
+            subplot = fig.add_subplot(len(data), 1, i+1)
+    
+            subplot.plot(times, data[i], label=str(data[i]))
+            #labels
+            subplot.set_xlabel("Timestep")
+            # Y label from measure_item
+            ylabel = meas_item[i]
+            subplot.set_ylabel(ylabel)
+            if title:
+                subplot.set_title(title)
+            subplot.legend(meas_item[i])
+
         fig.savefig(path)
         plt.close(fig)
         
