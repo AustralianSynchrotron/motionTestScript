@@ -49,11 +49,8 @@ class MotionControlTest(ABC):
                 )
             finally:
                 if gather_data:
-                    gathered_data = self.controller.end_gather(save_to_filename=f"{self.id}_output.txt", meas_item=measure_item, as_tuple=True)
-                    if result.gathered_data is None:
-                        result.gathered_data = {}
-                    result.gathered_data.update(gathered_data)
-                    self.visualise_gather_data(gathered_data, self.test_name, f"{self.id}_output.txt", measure_item)
+                    self.controller.end_gather(save_to_filename=f"{self.id}_output.txt", meas_item=measure_item, as_tuple=True)
+                    #self.visualise_gather_data(gathered_data, self.test_name, f"{self.id}_output.txt", measure_item)
                 return result
 
     def visualise_gather_data(self, data, title, path, measure_item):
