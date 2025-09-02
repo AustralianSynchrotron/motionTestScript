@@ -6,6 +6,7 @@ from controllerTest.MotionControlResult import MotionControlResult
 import uuid
 import numpy as np
 import matplotlib.pyplot as plt
+import threading
 
 class MotionControlTest(ABC):
     """
@@ -25,7 +26,8 @@ class MotionControlTest(ABC):
 
         if gather_data:
             print("Starting data gather...")
-            self.controller.start_gather(chan=motor, test_id=self.id, meas_item=measure_item)
+            thread = threading.Thread(target=self.controller.start_gather, args=(motor, self.id, measure_item))
+            thread.start()
         
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
