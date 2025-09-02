@@ -4,6 +4,8 @@ import time
 import concurrent.futures
 from controllerTest.MotionControlResult import MotionControlResult
 import uuid
+import numpy as np
+import matplotlib.pyplot as plt
 
 class MotionControlTest(ABC):
     """
@@ -51,7 +53,32 @@ class MotionControlTest(ABC):
                     if result.gathered_data is None:
                         result.gathered_data = {}
                     result.gathered_data.update(gathered_data)
+                    self.visualise_gather_data(gathered_data, self.test_name, f"{self.id}_output.txt", measure_item)
                 return result
+
+    def visualise_gather_data(self, data, title, path, measure_item):
+    
+        if data is None:
+            return None
+        times = np.arange(len(data))
+        fig = plt.figure()
+        for col in data.columns:
+            plt.plot(times, data[col], label=str(col))
+        #labels
+        plt.xlabel("Timestep")
+        # Y label from measure_item
+        if measure_item:
+            ylabel = measure_item[0] if len(measure_item) == 1 else "Value (" + ", ".join(measure_item) + ")"
+        else:
+            ylabel = "Value" if len(data.columns) > 1 else str(data.columns[0])
+        plt.ylabel(ylabel)
+        if title:
+            plt.title(title)
+        plt.legend()
+        fig.savefig(path)
+        plt.close(fig)
+        
+    
 
     @abstractmethod
     def execute(self, motor: int, encoder: int):

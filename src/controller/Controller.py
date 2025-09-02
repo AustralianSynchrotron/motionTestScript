@@ -238,6 +238,11 @@ class Controller:
         cmd = f"#{chan}v"
         vel = float(self.send_receive_with_print(cmd))
         return vel
+    
+    def get_maximum_velocity(self,chan):
+        cmd = f"Motor[{chan}].MaxSpeed"
+        max_vel = float(self.send_receive_with_print(cmd))
+        return max_vel
 
     def set_velocity(self, chan, vel):
         cmd = f"Motor[{chan}].JogSpeed = {vel}"

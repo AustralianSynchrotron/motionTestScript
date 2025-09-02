@@ -11,14 +11,22 @@ class LimitTest(MotionControlTest):
         #connect to the controller
         controller = self.controller
         st = time()
+        
+        #set speed to max speed
+        max_speed = controller.get_maximum_velocity(motor)
+        controller.set_velocity(motor, max_speed)
+
+        #back off in case it is on the switch already
+        controller.move_by_relative_pos_wait(motor, 10)
+        
         #move to positive end position
         #controller.set_velocity(motor, 0.001)
         controller.move_to_end_neg_wait(motor)
-        positive_end_result = int(controller.send_receive_with_print(f"Motor[{motor}].MinusLimit"))
+        negative_end_result = int(controller.send_receive_with_print(f"Motor[{motor}].MinusLimit"))
         
         #move to negative end position
         controller.move_to_end_pos_wait(motor)
-        negative_end_result = int(controller.send_receive_with_print(f"Motor[{motor}].PlusLimit"))
+        positive_end_result = int(controller.send_receive_with_print(f"Motor[{motor}].PlusLimit"))
         duration = time() - st
         #output the results
         print(f"Positive End Limit: {positive_end_result}")
