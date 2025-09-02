@@ -24,11 +24,13 @@ class MotionControlTest(ABC):
         """
 
         if gather_data:
+            print("Starting data gather...")
             self.controller.start_gather(chan=motor, test_id=self.id, meas_item=measure_item)
         
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(self.execute, motor, encoder)
+            print("executing test...")
             try:
                 # Wait until execute() completes or the timeout is reached.
                 result = future.result(timeout=timeout)
@@ -49,7 +51,8 @@ class MotionControlTest(ABC):
                 )
             finally:
                 if gather_data:
-                    self.controller.end_gather(save_to_filename=f"{self.id}_output.txt", meas_item=measure_item, as_tuple=True)
+                    print("Ending data gather...")
+                    self.controller.end_gather(self.id)
                     #self.visualise_gather_data(gathered_data, self.test_name, f"{self.id}_output.txt", measure_item)
                 return result
 

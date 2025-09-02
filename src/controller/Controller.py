@@ -288,7 +288,7 @@ class Controller:
 
         self.send_receive_with_print(f"Gather.Enable=3")
         #channel = self.session.invoke_shell(term='xterm')
-        _, stdout, _ = self.session.exec_command(f"gather /var/ftp/gather/python_script.txt", get_pty=True)
+        _, stdout, _ = self.session.exec_command(f"gather /var/ftp/gather/python_script_{test_id}.txt", get_pty=True)
 
 
         stdout.read()
@@ -303,14 +303,14 @@ class Controller:
         # sftp_dataget.get("/var/ftp/gather/python_script.txt", "current_output")
 
 
-    def end_gather(self, save_to_filename = "gather_output.txt", meas_item=[], as_tuple=False):
+    def end_gather(self, test_id):
         #stop recording
         time.sleep(10)
         self.send_receive_with_print(f"Gather.Enable=0")
         time.sleep(10)
         #saving the data into file
         sftp_dataget = self.session.open_sftp()
-        sftp_dataget.get("/var/ftp/gather/python_script.txt", save_to_filename)
+        sftp_dataget.get(f"/var/ftp/gather/python_script_{test_id}.txt", f"gather_output_{test_id}.txt")
         sftp_dataget.close()
         
         #read data
