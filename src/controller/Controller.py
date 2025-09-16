@@ -354,9 +354,9 @@ class Controller:
             time.sleep(1)
 
             self.move_to_end_neg_wait(chan)
-            neg_pos = self.get_pos(enc)
+            neg_pos = self.get_pos(chan)
             self.move_to_end_pos_wait(chan)
-            pos_pos = self.get_pos(enc)
+            pos_pos = self.get_pos(chan)
 
             middle_pos = (neg_pos + pos_pos) / 2
             self.move_to_pos_wait(chan, middle_pos)
