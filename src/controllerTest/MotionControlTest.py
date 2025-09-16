@@ -60,6 +60,7 @@ class MotionControlTest(ABC):
                 self.controller.graceful_exit(motor)
                 # Return a failed MotionControlResult.
                 result = MotionControlResult(
+                    id=self.id,
                     success=False,
                     test_name=self.test_name,
                     expected_value=None,
