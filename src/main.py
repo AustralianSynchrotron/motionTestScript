@@ -20,7 +20,7 @@ def main():
         timeout = 120
         run_id = "test_run_001"
 
-        controller.initialise(chan=motor)
+        controller.initialise(chan=motor, enc=encoder)
 
         for test in tests_to_run(controller=controller):
             test_result = test.main_execution(motor, encoder, timeout, gather_data, gather_data_items)

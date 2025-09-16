@@ -344,7 +344,7 @@ class Controller:
         self.send_receive_with_print(f"#{chan}k")
         self.phase(chan)
 
-    def initialise(self, chan):
+    def initialise(self, chan, enc):
         """Attempt full initialisation: phase, traverse limits, center, home.
 
         Returns True on success, False if any exception occurs.
@@ -354,14 +354,15 @@ class Controller:
             time.sleep(1)
 
             self.move_to_end_neg_wait(chan)
-            neg_pos = self.get_pos(chan)
+            neg_pos = self.get_pos(enc)
             self.move_to_end_pos_wait(chan)
-            pos_pos = self.get_pos(chan)
+            pos_pos = self.get_pos(enc)
 
             middle_pos = (neg_pos + pos_pos) / 2
             self.move_to_pos_wait(chan, middle_pos)
 
             self.home(chan)
+            self.home(enc)
 
             return True
         
