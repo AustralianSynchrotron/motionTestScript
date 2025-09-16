@@ -336,7 +336,7 @@ class Controller:
         self.send_receive_with_print(f"Gather.Enable=0")
         time.sleep(5)
         sftp_dataget = self.session.open_sftp()
-        sftp_dataget.get(f"/var/ftp/gather/python_script_{test_id}.txt", f"gather_output_{test_id}.txt")
+        sftp_dataget.get(f"/var/ftp/gather/python_script_{test_id}.txt", f"results/gather_output_{test_id}.txt")
         sftp_dataget.close()
 
     def graceful_exit(self, chan):

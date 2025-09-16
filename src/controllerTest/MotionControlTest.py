@@ -83,7 +83,7 @@ class MotionControlTest(ABC):
         """
 
         # Read raw gather file (space separated values)
-        df = pd.read_csv(f"gather_output_{id}.txt", delim_whitespace=True, header=None)
+        df = pd.read_csv(f"results/gather_output_{id}.txt", delim_whitespace=True, header=None)
         if len(df.columns) != len(meas_item):
             raise ValueError(f"Expected {len(meas_item)} columns, got {len(df.columns)}")
         df.columns = meas_item
