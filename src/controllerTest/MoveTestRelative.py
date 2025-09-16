@@ -18,7 +18,7 @@ Fields:
   precision : Maximum allowed absolute error between expected and final position.
 """
 
-class MoveTestAbsolute(MotionControlTest):
+class MoveTestRelative(MotionControlTest):
 
     def __init__(self, test_name: str, posn_add: float, controller: Controller, precision: float = 0.01):
         super().__init__(test_name, "Relative Move Test", controller)
