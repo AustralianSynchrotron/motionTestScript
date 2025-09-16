@@ -36,6 +36,7 @@ class LimitTest(MotionControlTest):
         success = positive_end_result and negative_end_result
         
         result = MotionControlResult(
+             id=self.id,
             success=success,
             test_name=self.test_name,
             expected_value="Both limits should be reached",

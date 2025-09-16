@@ -4,11 +4,12 @@ class MotionControlResult:
     Class to represent the result of a motion control operation.
     """
 
-    def __init__(self, success: bool, test_name: str,
+    def __init__(self, id: str, success: bool, test_name: str,
                  expected_value, actual_value, duration: float = None,
                  gathered_data: dict = None):
         self.success = success
 
+        self.id = id
         self.test_name = test_name
         self.expected_value = expected_value
         self.actual_value = actual_value

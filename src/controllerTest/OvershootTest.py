@@ -37,7 +37,7 @@ class OvershootTest(MotionControlTest):
         
         success = overshoot <= self.precision
 
-        result = MotionControlResult(success=success,
+        result = MotionControlResult(id=self.id, success=success,
                                      test_name=self.test_name, expected_value="<= " + str(self.precision),
                                      actual_value=overshoot, duration=duration)
         #check if the overshoot is within the precision

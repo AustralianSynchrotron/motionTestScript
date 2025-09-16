@@ -43,6 +43,7 @@ class RepeatabilityTest(MotionControlTest):
         success = abs(average_final_pos - self.endPosn) < self.precision and largest_deviation < self.errorMargin and standard_dev < self.max_std
 
         result = MotionControlResult(
+            id=self.id,
             success=success,
             test_name=self.test_name,
             expected_value=self.endPosn,

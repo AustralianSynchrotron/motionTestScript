@@ -24,7 +24,7 @@ class MoveTestAbsolute(MotionControlTest):
 
         success = abs(final_pos - self.posn) < self.precision
 
-        result = MotionControlResult(success=success,
+        result = MotionControlResult(id=self.id, success=success,
                                      test_name=self.test_name, expected_value=self.posn,
                                      actual_value=final_pos, duration=duration)
 
