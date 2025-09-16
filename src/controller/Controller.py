@@ -283,7 +283,7 @@ class Controller:
         """Return configured maximum speed (Motor[].MaxSpeed)."""
         cmd = f"Motor[{chan}].MaxSpeed"
         max_vel = float(self.send_receive_with_print(cmd))
-        return max_vel
+        return 0.004
 
     def set_velocity(self, chan, vel):
         """Set jog speed (Motor[].JogSpeed) then sleep briefly to let it apply."""
