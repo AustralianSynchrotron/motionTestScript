@@ -72,7 +72,7 @@ class MotionControlTest(ABC):
                     print("Ending data gather...")
                     self.controller.end_gather(self.id)
                     # Plot gathered signals (PNG saved using test id prefix)
-                    self.visualise_gather_data(self.id, self.test_name, f"{self.id}_graph_output", measure_item)
+                    self.visualise_gather_data(self.id, self.test_name, f"results/{self.id}_graph_output", measure_item)
                 return result
 
     def visualise_gather_data(self, id, title, path, meas_item):

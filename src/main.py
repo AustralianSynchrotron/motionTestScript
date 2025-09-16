@@ -27,7 +27,7 @@ def main():
             results.append(test_result)
 
         
-        ReportGenerator(results).generate_report(f"motion_control_report_{run_id}.txt")
+        ReportGenerator(results).generate_report(f"results/motion_control_report_{run_id}.txt")
 
         controller.disconnect()
 
