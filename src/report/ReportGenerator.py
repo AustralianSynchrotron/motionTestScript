@@ -1,3 +1,5 @@
+"""Generates a simple text report from a list of MotionControlResult instances."""
+
 from typing import List
 from controllerTest import MotionControlResult
 

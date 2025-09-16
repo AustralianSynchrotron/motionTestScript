@@ -25,11 +25,15 @@ def main():
         #currentTest = CurrentGather("Current test", controller=controller)
         #currentTest.execute(motor=2,encoder=10)
 
+        # limitTest = LimitTest(test_name="Limit Test", controller=controller)
+        # limitTestResult = limitTest.main_execution(motor, encoder,120,True,["Pos.a", "Pos.a"])
+        # print(limitTestResult)
+        # results.append(limitTestResult)
+        
+        
         limitTest = LimitTest(test_name="Limit Test", controller=controller)
-        limitTestResult = limitTest.main_execution(motor, encoder,120,True,["Pos.a", "Pos.a"])
-        print(limitTestResult)
-        results.append(limitTestResult)
-
+        id_this = "5bdd6e5f-0f3a-4983-b1cf-17d673dd488e"
+        limitTestResult = limitTest.visualise_gather_data(id_this, "move test absolute", f"{id}_graph_output2", ["Pos.a", "Pos.a"])
 
         """
         absMoveTestMicro = MoveTestAbsolute(test_name="Absolute Move Test Micro", posn=10.005, controller=controller, precision=0.001)
