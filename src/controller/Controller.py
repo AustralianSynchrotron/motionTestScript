@@ -377,6 +377,7 @@ class Controller:
     def phase(self, chan):
         """Issue phase commands (power-on sequence)."""
         self.send_receive_with_print(f"#{chan}$")
+        time.sleep(0.5)
         self.send_receive_with_print(f"#{chan}j/")
         
     def custom_command_non_blocking(self, chan: str, cmd: str):
