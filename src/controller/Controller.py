@@ -30,7 +30,7 @@ class Controller:
             self.session.connect(self.host,
                                            username=username,
                                            password=password)
-            # see also paramiko timeout=self.TIMEOUT)
+
             logger.info("Success, connected.")
             success = True
         except paramiko.AuthenticationException:
@@ -38,12 +38,9 @@ class Controller:
                          f"to {self.host}")
             sys.exit(1)
 
-        # 8192 is paramiko default bufsize
         self.stdin, self.stdout, self.stderr = \
             self.session.exec_command("gpascii -2", bufsize=8192)
-        print(success)
 
-        # wait until gpascii ready
         while self._read_until("Input") == "":
             pass
 
@@ -73,11 +70,9 @@ class Controller:
 
         if self.err_buffer  != [""]:
             for error in self.err_buffer:
-                # error_temp = error.decode("utf-8")
-                error_temp = error # .decode("utf-8")
-                logger.error(f"std_err:{error_temp}") #self.err_buffer}")
+                error_temp = error 
+                logger.error(f"std_err:{error_temp}") 
 
-            #self.err_buffer = [] #""
             assert False, f"std_err: {self.err_buffer}"
 
         response = self._read_buf_until(termstr)  # fast read from buffer
@@ -183,13 +178,7 @@ class Controller:
 
     def send_receive_with_print(self, cmd):
         response_dict = self.send_receive_low([cmd])
-
-        # strip out the command strings.
         response = response_dict[cmd][1]
-        # response_dict contains dictionary of commands sent, and their response.
-    
-        #print(f"sent \" {cmd} \"")
-        #print(f"response \" {response} \"")
         return response
     
     def wait_till_done(self, chan):
@@ -199,7 +188,6 @@ class Controller:
         while inpos_state != 1:
             inpos_state = int(self.send_receive_with_print(cmd))
             time.sleep(0.1)
-        #print("DONE!")
     
     def move_to_pos_wait(self, chan, posn):
         cmd = f"#{chan}j={posn}"
@@ -242,7 +230,6 @@ class Controller:
     def get_maximum_velocity(self,chan):
         cmd = f"Motor[{chan}].MaxSpeed"
         max_vel = float(self.send_receive_with_print(cmd))
-        max_vel = 0.004
         return max_vel
 
     def set_velocity(self, chan, vel):
@@ -250,29 +237,10 @@ class Controller:
         self.send_receive_with_print(cmd)
         time.sleep(1)
 
-    def zero_out(self, chan):
-        cmd = f"motor[{chan}].zero" # check this actual command
-        self.send_receive_with_print(cmd)
-        time.sleep(1)
-
     def in_pos(self, chan):
         cmd = f"motor[{chan}].inpos"
         inpos_state = int(self.send_receive_with_print(cmd))
         return inpos_state
-    
-    """
-    def current_fetch(self, chan, time_period, time_step):
-        times = np.arange(0,time_period,time_step)
-        currents = []
-        for i in range(len(times)):
-            cmd = f"motor[{chan}].IqMeas"
-            current_ADC = float(self.send_receive_with_print(cmd))
-            sensor_scaling_factor = 1/1000  # Example scaling factor, adjust as needed
-            current = current_ADC * sensor_scaling_factor
-            currents.append(current)
-            time.sleep(0.01)
-        return currents
-    """
 
     def start_gather(self, chan, test_id, meas_item=[]):
         num_items = len(meas_item)
@@ -288,46 +256,21 @@ class Controller:
         self.send_receive_with_print(f"Gather.Items={num_items}")
 
         self.send_receive_with_print(f"Gather.Enable=3")
-        #channel = self.session.invoke_shell(term='xterm')
-        _, stdout, _ = self.session.exec_command(f"gather /var/ftp/gather/python_script_{test_id}.txt", get_pty=True)
 
+        _, stdout, _ = self.session.exec_command(f"gather /var/ftp/gather/python_script_{test_id}.txt", get_pty=True)
 
         stdout.read()
 
-        print("Thread closing")
-        #time.sleep(20)
-
-        # self.move_to_pos_wait(2,10)
-        # time.sleep(10)
-        # self.send_receive_with_print(f"Gather.Enable=0")
-        # sftp_dataget = self.session.open_sftp()
-        # sftp_dataget.get("/var/ftp/gather/python_script.txt", "current_output")
-
-
     def end_gather(self, test_id):
-        #stop recording
-        time.sleep(10)
+        time.sleep(5)
         self.send_receive_with_print(f"Gather.Enable=0")
-        time.sleep(10)
-        #saving the data into file
+        time.sleep(5)
         sftp_dataget = self.session.open_sftp()
         sftp_dataget.get(f"/var/ftp/gather/python_script_{test_id}.txt", f"gather_output_{test_id}.txt")
         sftp_dataget.close()
-        
-        #read data
-        #df = pd.read_csv(save_to_filename, delim_whitespace=True, header=None)
-        #if len(df.columns) != len(meas_item):
-        #    raise ValueError(f"Expected {len(meas_item)} columns, got {len(df.columns)}")
-        #df.columns = meas_item
-        #
-        #if as_tuple:
-        #    return tuple(df[col] for col in df.columns)
-        
-        #return df
-        
 
     def graceful_exit(self, chan):
-        self.send_cmd(f"#{chan}k")
+        self.send_receive_with_print(f"#{chan}k")
         self.phase(chan)
 
     def initialise(self, chan):
@@ -352,31 +295,20 @@ class Controller:
             return False
 
     def home(self, chan):
-        self.send_cmd(f"#{chan}homez")
+        self.send_receive_with_print(f"#{chan}homez")
 
     def phase(self, chan):
-        self.send_cmd(f"#{chan}$")
-        self.send_cmd(f"#{chan}j/")
+        self.send_receive_with_print(f"#{chan}$")
+        self.send_receive_with_print(f"#{chan}j/")
         
+    def custom_command_non_blocking(self, chan: str, cmd: str):
+        # custom command with $$chan$$ replaced by chan
+        cmd.replace("$$chan$$", f"{chan}")
+        self.send_receive_with_print(cmd)
 
-
-
-
-
+    def custom_command_blocking(self, chan, cmd):
+        # blocking custom command with $$chan$$ replaced by chan
+        cmd.replace("$$chan$$", f"{chan}")
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
         
-        
-    
-#ppmac = Controller(host="10.23.231.3")
-#ppmac.connect()
-#chan = 9
-#posn = ppmac.get_pos(chan)
-#print(posn)
-# posn += 10 # increment by 1 [mm]
-# ppmac.move_to_pos_wait(chan, posn)
-# posn = ppmac.get_pos(chan)
-#ppmac.set_velocity(chan, 0.01)
-#posn += 10
-#ppmac.move_to_pos(chan, posn)
-#ppmac.get_velocity(chan)
-#ppmac.wait_till_done(chan)
-#posn = ppmac.get_pos(chan)
