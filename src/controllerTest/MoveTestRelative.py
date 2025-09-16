@@ -35,7 +35,7 @@ class MoveTestRelative(MotionControlTest):
         expected_pos = initial_pos + self.posn_add
 
         st = time()
-        controller.move_to_pos_wait(motor, self.posn_add)
+        controller.move_to_pos_relative_wait(motor, self.posn_add)
         final_pos = controller.get_pos(encoder)
         duration = time() - st
 

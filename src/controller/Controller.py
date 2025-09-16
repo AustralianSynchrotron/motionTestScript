@@ -239,6 +239,12 @@ class Controller:
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
 
+    def move_to_pos_relative_wait(self, chan, posn):
+        """Absolute move then block until in-position."""
+        cmd = f"#{chan}j^{posn}"
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
+
     def move_to_pos(self, chan, posn):
         """Absolute move (non-blocking)."""
         cmd = f"#{chan}j={posn}"
@@ -380,14 +386,14 @@ class Controller:
         time.sleep(0.5)
         self.send_receive_with_print(f"#{chan}j/")
         
-    def custom_command_non_blocking(self, chan: str, cmd: str):
+    def custom_command_non_blocking(self, chan, cmd: str):
         """$$chan$$ to chan"""
-        cmd.replace("$$chan$$", f"{chan}")
+        cmd.replace("chan", f"{chan}")
         self.send_receive_with_print(cmd)
 
-    def custom_command_blocking(self, chan, cmd):
+    def custom_command_blocking(self, chan, cmd: str):
         """Blocking command for $$chan$$ to chan"""
-        cmd.replace("$$chan$$", f"{chan}")
+        cmd.replace("chan", f"{chan}")
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
         

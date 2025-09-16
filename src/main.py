@@ -29,7 +29,7 @@ def main():
         
         ReportGenerator(results).generate_report(f"results/motion_control_report_{run_id}.txt")
 
-        controller.custom_command_blocking(chan=2, cmd="#$$chan$$j=2")
+        controller.custom_command_blocking(chan=2, cmd="#chanj=2")
 
         controller.disconnect()
 
