@@ -388,12 +388,12 @@ class Controller:
         
     def custom_command_non_blocking(self, chan, cmd: str):
         """$$chan$$ to chan"""
-        cmd.replace("chan", f"{chan}")
+        cmd = cmd.replace("chan", f"{chan}")
         self.send_receive_with_print(cmd)
 
     def custom_command_blocking(self, chan, cmd: str):
         """Blocking command for $$chan$$ to chan"""
-        cmd.replace("chan", f"{chan}")
+        cmd = cmd.replace("chan", f"{chan}")
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
         
