@@ -297,15 +297,15 @@ class Controller:
         inpos_state = int(self.send_receive_with_print(cmd))
         return inpos_state
 
-        def start_gather(self, chan, test_id, meas_item=[]):  # NOTE: mutable default kept (original code)
-                """Configure and start a gather acquisition.
+    def start_gather(self, chan, test_id, meas_item=[]):  # NOTE: mutable default kept (original code)
+        """Configure and start a gather acquisition.
 
-                meas_item: list of motor field names to gather (e.g. ["ActVel", "Pos"])
-                Gather.Enable sequence:
-                    0 = disable / reset
-                    3 = enable & start (captures configured addresses)
-                Export is initiated via a separate 'gather' shell command (blocking until done).
-                """
+        meas_item: list of motor field names to gather (e.g. ["ActVel", "Pos"])
+        Gather.Enable sequence:
+            0 = disable / reset
+            3 = enable & start (captures configured addresses)
+        Export is initiated via a separate 'gather' shell command (blocking until done).
+        """
         num_items = len(meas_item)
         #setting up the gather command
         self.send_receive_with_print(f"Gather.Enable=0")
