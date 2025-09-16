@@ -1,6 +1,7 @@
-from controllerTest import MoveTestAbsolute, VelocityTest, LimitTest, RepeatabilityTest, OvershootTest, MotionControlResult
+from controllerTest import MotionControlTest, MoveTestAbsolute, VelocityTest, LimitTest, RepeatabilityTest, OvershootTest, MotionControlResult
 from controller import Controller
 from report import ReportGenerator
+from typing import List
 
 def main():
     """
@@ -8,13 +9,27 @@ def main():
     """
 
     try:
-
-        controller = Controller(host="10.23.231.3")
+        host_ip = "10.23.231.3"
+        controller = Controller(host=host_ip)
         controller.connect()
         results = []
         motor = 2
         encoder = 10
+        gather_data = True
+        gather_data_items = ["IqCmd.a", "Pos.a"]
+        timeout = 120
+        run_id = "test_run_001"
 
+        controller.initialise(chan=motor)
+
+        for test in tests_to_run(controller=controller):
+            test_result = test.main_execution(motor, encoder, timeout, gather_data, gather_data_items)
+            results.append(test_result)
+
+        
+        ReportGenerator(results).generate_report(f"motion_control_report_{run_id}.txt")
+
+        controller.disconnect()
 
         # absMoveTestMacro = MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=-50, controller=controller,precision=0.001)
         # absMoveTestMacroResult = absMoveTestMacro.main_execution(motor, encoder, 60, True, ["IqCmd.a", "Pos.a"])
@@ -31,9 +46,9 @@ def main():
         # results.append(limitTestResult)
         
         
-        limitTest = LimitTest(test_name="Limit Test", controller=controller)
-        id_this = "5bdd6e5f-0f3a-4983-b1cf-17d673dd488e"
-        limitTestResult = limitTest.visualise_gather_data(id_this, "move test absolute", f"{id}_graph_output2", ["Pos.a", "Pos.a"])
+        #limitTest = LimitTest(test_name="Limit Test", controller=controller)
+        #id_this = "5bdd6e5f-0f3a-4983-b1cf-17d673dd488e"
+        #limitTestResult = limitTest.visualise_gather_data(id_this, "move test absolute", f"{id}_graph_output2", ["Pos.a", "Pos.a"])
 
         """
         absMoveTestMicro = MoveTestAbsolute(test_name="Absolute Move Test Micro", posn=10.005, controller=controller, precision=0.001)
@@ -129,6 +144,15 @@ def main():
     except KeyboardInterrupt:
         controller.graceful_exit(chan=1)
         controller.disconnect()
+
+def tests_to_run(controller) -> List[MotionControlTest]:
+
+    tests = []
+
+    tests.append(MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=-50, controller=controller,precision=0.001))
+    tests.append(LimitTest(test_name="Limit Test", controller=controller))                                                                                          
+
+    return tests
 
 
 if __name__ == "__main__":
