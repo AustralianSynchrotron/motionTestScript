@@ -53,7 +53,7 @@ class MotionControlTest(ABC):
                 result = future.result(timeout=timeout)
                 elapsed = time.time() - start_time
                 print(f"Test '{self.test_name}' completed in {elapsed:.2f} seconds.")
-            except concurrent.futures.TimeoutError:
+            except Exception:
                 elapsed = time.time() - start_time
                 print(f"Test '{self.test_name}' timed out after {elapsed:.2f} seconds.")
                 # Attempt to stop current command, if supported.
