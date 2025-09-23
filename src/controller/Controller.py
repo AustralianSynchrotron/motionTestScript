@@ -1,3 +1,22 @@
+"""Controller abstraction for interacting with a Power PMAC over SSH (gpascii).
+
+Provides:
+    - Connection management (open / close SSH, launch gpascii)
+    - Non blocking buffered reads of stdout / stderr
+    - Command send + response parsing with simple synchronization
+    - Convenience motion helpers (absolute / relative / limit moves)
+    - Basic status queries (position, velocity, in-position, max speed)
+    - Gather start / end helpers for data acquisition
+    - Homing / phasing / initialization routine
+
+Notes / Assumptions:
+    - A single interactive gpascii channel is used (stdin/stdout/stderr) for most commands.
+    - Gather export is launched with a separate exec_command. The current implementation
+        blocks on reading its stdout (stdout.read()) until the export completes.
+    - Error handling is minimal; stderr lines are captured and any non-empty content causes an assert.
+    - Timing sleeps (e.g. after enabling gather, during initialisation) are empirical and could be
+        refined or replaced with state polling for robustness.
+"""
 
 import logging
 import time
@@ -11,8 +30,20 @@ import paramiko.client as client
 logger = logging.getLogger(__name__)
 
 class Controller:
+    """High-level wrapper around Paramiko SSH session to a Power PMAC.
+
+    Exposes motion and data-gather operations as simple Python methods.
+    Internal buffers accumulate stdout until terminators are detected ("Input" on connect,
+    or '\x06' for command acknowledgements). Methods generally raise via asserts on sync
+    or stderr issues rather than structured exceptions.
+    """
 
     def __init__(self, host):
+        """Create controller instance.
+
+        host: IP / hostname of the Power PMAC.
+        Does not connect immediately; call connect().
+        """
         self.host = host
         self.rcv_buffer = ""
         self.err_buffer = [] # ""
@@ -23,6 +54,10 @@ class Controller:
         self.prev_index =0
 
     def connect(self, username="root", password="deltatau"):
+        """Establish SSH session and start an interactive gpascii (-2) process.
+
+        Blocks until the initial 'Input' prompt is detected.
+        """
         try:
             self.session = paramiko.SSHClient()
             self.session.set_missing_host_key_policy(
@@ -30,7 +65,7 @@ class Controller:
             self.session.connect(self.host,
                                            username=username,
                                            password=password)
-            # see also paramiko timeout=self.TIMEOUT)
+
             logger.info("Success, connected.")
             success = True
         except paramiko.AuthenticationException:
@@ -38,17 +73,14 @@ class Controller:
                          f"to {self.host}")
             sys.exit(1)
 
-        # 8192 is paramiko default bufsize
         self.stdin, self.stdout, self.stderr = \
             self.session.exec_command("gpascii -2", bufsize=8192)
-        print(success)
 
-        # wait until gpascii ready
         while self._read_until("Input") == "":
             pass
 
     def disconnect(self):
-        """ close the connection """
+        """Close the SSH session and reset internal counters/buffers."""
         self.session.close()
         logger.info("Disconnected.")
         self.rcv_buffer = ""
@@ -66,18 +98,19 @@ class Controller:
 
 
     def _read_until(self, termstr):
-        """ a non-async single non-blocking read into rcv_buffer and
-        will return the string up to termstr off the buffer if available """
+        """Perform a non-blocking read loop until 'termstr' appears in buffer.
+
+        Returns the substring (excluding termstr). If stderr captured lines they
+        are logged and trigger an assert.
+        """
         # if its not already in the buffer then get more from buffer
         self.read_to_buf()
 
         if self.err_buffer  != [""]:
             for error in self.err_buffer:
-                # error_temp = error.decode("utf-8")
-                error_temp = error # .decode("utf-8")
-                logger.error(f"std_err:{error_temp}") #self.err_buffer}")
+                error_temp = error 
+                logger.error(f"std_err:{error_temp}") 
 
-            #self.err_buffer = [] #""
             assert False, f"std_err: {self.err_buffer}"
 
         response = self._read_buf_until(termstr)  # fast read from buffer
@@ -86,6 +119,7 @@ class Controller:
         return response
 
     def _read_buf_until(self, termstr):
+        """Search existing rcv_buffer for termstr and slice out consumed segment."""
         ack_pos = self.rcv_buffer.find(termstr)
         if ack_pos == -1:
             return ""
@@ -100,7 +134,7 @@ class Controller:
         return response
 
     def read_to_buf(self):
-        """just get any data off ssh and put into local buffer """
+        """Pump any pending stdout/stderr into local buffers (non-blocking)."""
         st_time = time.time()
         # non-blocking read
         self.rcv_buffer += self.nb_read()
@@ -114,8 +148,7 @@ class Controller:
         self.rcv_time += time.time() - st_time
 
     def nb_read(self):
-        """non-blocking read
-        returns whatever in stdout, up to 1024 bytes"""
+        """Non-blocking read of stdout (up to 1024 bytes)."""
         buffer = ""
         # Only get data if there is data to read in the channel
         if self.stdout.channel.recv_ready():
@@ -126,7 +159,7 @@ class Controller:
         return buffer
 
     def nb_read_stderr(self):
-        """ non-blocking read of stderr"""
+        """Non-blocking read of stderr (up to 1024 bytes)."""
         buffer = ""
         # Only get data if there is data to read in the channel
         if self.stderr.channel.recv_stderr_ready():
@@ -136,7 +169,10 @@ class Controller:
 
 
     def send_receive_low(self, cmd_list, stripchar="\r\n\x06"):
-        """ send a list of commands & receive a list back"""
+        """Send list of commands and return a dict of raw parsed responses.
+
+        stripchar: characters removed from raw response lines.
+        """
         for cmd in cmd_list:
             self.send_cmd(cmd)
 
@@ -152,7 +188,7 @@ class Controller:
         return out_dict
 
     def send_cmd(self, cmd):
-        """ send """
+        """Write a single command line to gpascii stdin and flush."""
         st_time = time.time()
         logger.debug(f"sendin {cmd}")
         self.num_sent += 1
@@ -161,8 +197,10 @@ class Controller:
         self.send_time += time.time() - st_time
 
     def process_response(self, response, cmd_expected, stripchar="\r\n\x06"):
-        """ takes raw string from ppmac, and finters and checks
-        returns [cmd, response] pair"""
+        """Filter, validate, and split a raw response.
+
+        Returns [original_cmd, value_or_echo]. Asserts on mismatched echoes.
+        """
         # strip off undesired char
         for char in stripchar:
             response = response.replace(char, "")
@@ -182,131 +220,141 @@ class Controller:
         return cmd_response
 
     def send_receive_with_print(self, cmd):
+        """Helper: send a single command and return only its value portion."""
         response_dict = self.send_receive_low([cmd])
-
-        # strip out the command strings.
         response = response_dict[cmd][1]
-        # response_dict contains dictionary of commands sent, and their response.
-    
-        #print(f"sent \" {cmd} \"")
-        #print(f"response \" {response} \"")
         return response
     
     def wait_till_done(self, chan):
+        """Poll Motor[].InPos until it reports 1 (every 100 ms)."""
         cmd = f"motor[{chan}].inpos"
         inpos_state = int(self.send_receive_with_print(cmd))
-        #print("Waiting Till Done")
-        while (inpos_state) != 1:
+        while inpos_state != 1:
             inpos_state = int(self.send_receive_with_print(cmd))
             time.sleep(0.1)
-        #print("DONE!")
     
     def move_to_pos_wait(self, chan, posn):
+        """Absolute move then block until in-position."""
         cmd = f"#{chan}j={posn}"
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
 
+    def move_to_pos_relative_wait(self, chan, posn):
+        """Absolute move then block until in-position."""
+        cmd = f"#{chan}j^{posn}"
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
+
     def move_to_pos(self, chan, posn):
+        """Absolute move (non-blocking)."""
         cmd = f"#{chan}j={posn}"
         self.send_receive_with_print(cmd)
 
     def move_by_relative_pos_wait(self, chan, relPosn):
+        """Relative move then wait until in-position."""
         cmd = f"#{chan}j^{relPosn}"
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
 
     def move_to_end_pos_wait(self, chan):
+        """Jog toward positive end limit and wait until motion completes."""
         cmd = f"#{chan}j+"
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
 
     def move_to_end_neg_wait(self, chan):
+        """Jog toward negative end limit and wait until motion completes."""
         cmd = f"#{chan}j-"
         self.send_receive_with_print(cmd)
         self.wait_till_done(chan)
 
     def move_to_end_neg(self, chan):
+        """Jog negative (non-blocking)."""
         cmd = f"#{chan}j-"
         self.send_receive_with_print(cmd)
 
     def get_pos(self, chan):
+        """Return current motor position as float."""
         cmd = f"#{chan}p"
         pos = float(self.send_receive_with_print(cmd))
         return pos
     
     def get_velocity(self, chan):
+        """Return current commanded velocity (units per second)."""
         cmd = f"#{chan}v"
         vel = float(self.send_receive_with_print(cmd))
         return vel
+    
+    def get_maximum_velocity(self,chan):
+        """Return configured maximum speed (Motor[].MaxSpeed)."""
+        cmd = f"Motor[{chan}].MaxSpeed"
+        max_vel = float(self.send_receive_with_print(cmd))
+        return 0.004
 
     def set_velocity(self, chan, vel):
+        """Set jog speed (Motor[].JogSpeed) then sleep briefly to let it apply."""
         cmd = f"Motor[{chan}].JogSpeed = {vel}"
         self.send_receive_with_print(cmd)
         time.sleep(1)
 
-    def zero_out(self, chan):
-        cmd = f"motor[{chan}].zero" # check this actual command
-        self.send_receive_with_print(cmd)
-        time.sleep(1)
-
     def in_pos(self, chan):
+        """Return 1 if motor is in-position else 0."""
         cmd = f"motor[{chan}].inpos"
         inpos_state = int(self.send_receive_with_print(cmd))
         return inpos_state
-    
-    def current_fetch(self, chan, time_period, time_step):
-        times = np.arange(0,time_period,time_step)
-        currents = []
-        for i in range(len(times)):
-            cmd = f"motor[{chan}].IqMeas"
-            current_ADC = float(self.send_receive_with_print(cmd))
-            sensor_scaling_factor = 1/1000  # Example scaling factor, adjust as needed
-            current = current_ADC * sensor_scaling_factor
-            currents.append(current)
-            time.sleep(0.01)
-        return currents
-    
-    def current_fetch_in_batch(self, chan):
-        pass
-        self.send_cmd(f"Gather.Enable=0")
-        self.send_cmd(f"Gather.Items=2")
-        self.send_cmd(f"Gather.Period=1")
-        self.send_cmd(f"Gather.MaxSamples=2000")
 
-        #self.send_cmd(f"Gather.Addr[0] = Motor[{chan}].IaMeas")
-        #self.send_cmd(f"Gather.Addr[1] = Motor[{chan}].IbMeas")
+    def start_gather(self, chan, test_id, meas_item=[]):  # NOTE: mutable default kept (original code)
+        """Configure and start a gather acquisition.
 
-        self.send_cmd(f"Gather.Enable=2")
-        self.send_cmd(f"Gather.Enable=1")
+        meas_item: list of motor field names to gather (e.g. ["ActVel", "Pos"])
+        Gather.Enable sequence:
+            0 = disable / reset
+            3 = enable & start (captures configured addresses)
+        Export is initiated via a separate 'gather' shell command (blocking until done).
+        """
+        num_items = len(meas_item)
+        #setting up the gather command
+        self.send_receive_with_print(f"Gather.Enable=0")
         
-        #potentially need to move the robot here
-        
-        time.sleep(1)
-        self.send_cmd(f"Gather.Enable=0")
-        
-        
-        
-        result = self.send_receive_with_print("gather /var/ftp/gather/gatheroutput.txt")
-        #try gather /var/ftp/gather/gatheroutput.txt
-        #try save gather
-        
-        #download the data
+        self.send_receive_with_print(f"Gather.Period=1")
+        # self.send_cmd(f"Gather.MaxSamples={max_sample}")
+
+        for i in range(num_items):
+            self.send_receive_with_print(f"Gather.Addr[{i}] = Motor[{chan}].{meas_item[i]}")
+
+        self.send_receive_with_print(f"Gather.Items={num_items}")
+
+        self.send_receive_with_print(f"Gather.Enable=3")
+
+        # Launch gather export of the internal buffer to a file. This blocks until the
+        # controller finishes writing the file (stdout.read()). Consider making non-blocking
+        # if long captures are required.
+        _, stdout, _ = self.session.exec_command(
+            f"gather /var/ftp/gather/python_script_{test_id}.txt", get_pty=True)
+        stdout.read()  # Wait for export completion
+
+    def end_gather(self, test_id):
+        """Stop gather and SFTP the exported file locally as gather_output_<id>.txt.
+
+        Sleeps are retained from original implementation (could be shortened with polling).
+        """
+        time.sleep(5)
+        self.send_receive_with_print(f"Gather.Enable=0")
+        time.sleep(5)
         sftp_dataget = self.session.open_sftp()
-        sftp_dataget.get("/var/ftp/gather/gatheroutput.txt", "gather_output.txt")
+        sftp_dataget.get(f"/var/ftp/gather/python_script_{test_id}.txt", f"results/gather_output_{test_id}.txt")
         sftp_dataget.close()
-        
-        #read the data
-        df = pd.read_csv("gather_output.txt", delim_whitespace=True, header=None)
-        df.columns = ["IqMeas", "IaMeas"]
-        print(df.head())
-        
-        return df["IaMeas"].to_numpy(), df["IbMeas"].to_numpy()
 
     def graceful_exit(self, chan):
-        self.send_cmd(f"#{chan}k")
+        """Abort motion (#k) then re-phase motor."""
+        self.send_receive_with_print(f"#{chan}k")
         self.phase(chan)
 
-    def initialise(self, chan):
+    def initialise(self, chan, enc):
+        """Attempt full initialisation: phase, traverse limits, center, home.
+
+        Returns True on success, False if any exception occurs.
+        """
         try: 
             self.phase(chan)
             time.sleep(1)
@@ -320,6 +368,7 @@ class Controller:
             self.move_to_pos_wait(chan, middle_pos)
 
             self.home(chan)
+            self.home(enc)
 
             return True
         
@@ -328,29 +377,23 @@ class Controller:
             return False
 
     def home(self, chan):
-        self.send_cmd(f"#{chan}homez")
+        """Issue home search (homez)."""
+        self.send_receive_with_print(f"#{chan}homez")
 
     def phase(self, chan):
-        self.send_cmd(f"#{chan}$")
-        self.send_cmd(f"#{chan}j/")
-
-
-
-
+        """Issue phase commands (power-on sequence)."""
+        self.send_receive_with_print(f"#{chan}$")
+        time.sleep(0.5)
+        self.send_receive_with_print(f"#{chan}j/")
         
+    def custom_command_non_blocking(self, chan, cmd: str):
+        """$$chan$$ to chan"""
+        cmd = cmd.replace("chan", f"{chan}")
+        self.send_receive_with_print(cmd)
+
+    def custom_command_blocking(self, chan, cmd: str):
+        """Blocking command for $$chan$$ to chan"""
+        cmd = cmd.replace("chan", f"{chan}")
+        self.send_receive_with_print(cmd)
+        self.wait_till_done(chan)
         
-    
-#ppmac = Controller(host="10.23.231.3")
-#ppmac.connect()
-#chan = 9
-#posn = ppmac.get_pos(chan)
-#print(posn)
-# posn += 10 # increment by 1 [mm]
-# ppmac.move_to_pos_wait(chan, posn)
-# posn = ppmac.get_pos(chan)
-#ppmac.set_velocity(chan, 0.01)
-#posn += 10
-#ppmac.move_to_pos(chan, posn)
-#ppmac.get_velocity(chan)
-#ppmac.wait_till_done(chan)
-#posn = ppmac.get_pos(chan)
