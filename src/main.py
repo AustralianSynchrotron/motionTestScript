@@ -41,10 +41,33 @@ def tests_to_run(controller) -> List[MotionControlTest]:
 
     tests = []
 
+    # Asbolute Move Tests
     tests.append(MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=-50, controller=controller,precision=0.001))
-    tests.append(LimitTest(test_name="Limit Test", controller=controller))      
-    tests.append(MoveTestRelative(test_name="Relative Move Test Macro", posn_add=20, controller=controller, precision=0.001))   
-    tests.append(RepeatabilityTest(test_name="Repeatability Test", startPosn=10, endPosn=20, controller=controller, errorMargin=0.01, precision=0.001, runs=5))                                                                                 
+    tests.append(MoveTestAbsolute(test_name="Absolute Move Test Micro", posn=10.005, controller=controller, precision=0.001))
+    tests.append(MoveTestAbsolute(test_name="Absolute Move Test Macro Precise", posn=25.005, controller=controller, precision=0.001))
+
+    # Relative Move Tests
+    tests.append(MoveTestRelative(test_name="Relative Move Test Macro", posn_add=-50, controller=controller,precision=0.001))
+    tests.append(MoveTestRelative(test_name="Relative Move Test Micro", posn_add=10.005, controller=controller, precision=0.001))
+    tests.append(MoveTestRelative(test_name="Relative Move Test Macro Precise", posn_add=25.005, controller=controller, precision=0.001))
+    
+    # Repeatability Tests
+    tests.append(RepeatabilityTest(test_name="Repeatability Test Micro", startPosn=10, endPosn=10.005, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
+    tests.append(RepeatabilityTest(test_name="Repeatability Test Macro", startPosn=10, endPosn=20, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
+    tests.append(RepeatabilityTest(test_name="Repeatability Test Micro Large", startPosn=10, endPosn=20.005, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
+
+    # Overshoot Tests
+    tests.append(OvershootTest(test_name="Overshoot Test Slow", velocity=0.001, controller=controller, precision=0.001, distance=10))
+    tests.append(OvershootTest(test_name="Overshoot Test Medium", velocity=0.0025, controller=controller, precision=0.001, distance=0))
+    tests.append(OvershootTest(test_name="Overshoot Test Fast", velocity=0.005, controller=controller, precision=0.001, distance=10))
+    
+    # Velocity Tests
+    tests.append(VelocityTest(test_name="Velocity Test Slow", velocity=0.001, controller=controller, precision=0.001))
+    tests.append(VelocityTest(test_name="Velocity Test Medium", velocity=0.0025, controller=controller, precision=0.001))
+    tests.append(VelocityTest(test_name="Velocity Test Fast", velocity=0.004, controller=controller, precision=0.001))
+
+    # Limit Test
+    tests.append(LimitTest(test_name="Limit Test", controller=controller))                                                                             
 
     return tests
 
