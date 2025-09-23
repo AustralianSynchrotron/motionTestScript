@@ -46,7 +46,7 @@ class MoveTestRelative(MotionControlTest):
             success=success,
             generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value=f"Relative move of {self.posn_add} ± {self.precision}",
+            expected_value=f"Relative move of {self.posn_add} +/- {self.precision}",
             actual_value=final_pos - initial_pos,
             duration=duration,
             extra_data={

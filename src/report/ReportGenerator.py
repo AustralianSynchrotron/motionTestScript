@@ -21,7 +21,7 @@ class ReportGenerator:
                 report_file.write(f"Expected Value: {result.expected_value}\n")
                 report_file.write(f"Actual Value: {result.actual_value}\n")
                 report_file.write(f"Test Duration: {result.duration:.3f} seconds\n")
-                report_file.write(f"Extra Data: {result.gathered_data}\n")
+                report_file.write(f"Extra Data: {result.extra_data}\n")
                 report_file.write("-------------------------------\n")
             report_file.write("End of Report\n")
         print(f"Report generated at {path}")

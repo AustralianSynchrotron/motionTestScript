@@ -32,7 +32,7 @@ class MoveTestAbsolute(MotionControlTest):
             success=success,
             generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value=f"Position {self.posn} ± {self.precision}",
+            expected_value=f"Position {self.posn} +/- {self.precision}",
             actual_value=final_pos,
             duration=duration,
             extra_data={

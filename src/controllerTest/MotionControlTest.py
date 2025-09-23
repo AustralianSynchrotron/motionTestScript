@@ -100,7 +100,7 @@ class MotionControlTest(ABC):
             ax.plot(times, df[meas_item[i]], label=meas_item[i])
             if len(times):
                 max_t = times[-1]
-                second_ticks = np.arange(0, max_t + 1, 1)
+                second_ticks = np.arange(0, max_t + 1, 5)
                 ax.set_xticks(second_ticks)
             # Axis labels
             ax.set_xlabel("Times (s)")
@@ -110,7 +110,7 @@ class MotionControlTest(ABC):
                 ax.set_title(title)
             ax.legend()
 
-        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+        fig.tight_layout()
         fig.savefig(path)
         plt.close(fig)
 

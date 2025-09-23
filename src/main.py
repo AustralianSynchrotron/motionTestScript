@@ -17,7 +17,7 @@ def main():
         encoder = 10
         gather_data = True
         gather_data_items = ["IqCmd.a", "Pos.a"]
-        timeout = 120
+        timeout = 300
         run_id = "test_run_001"
 
         controller.initialise(chan=motor, enc=encoder)
@@ -34,7 +34,7 @@ def main():
         controller.disconnect()
 
     except KeyboardInterrupt:
-        controller.graceful_exit(chan=1)
+        controller.graceful_exit(chan=motor)
         controller.disconnect()
 
 def tests_to_run(controller) -> List[MotionControlTest]:
@@ -43,12 +43,12 @@ def tests_to_run(controller) -> List[MotionControlTest]:
 
     # Asbolute Move Tests
     tests.append(MoveTestAbsolute(test_name="Absolute Move Test Macro", posn=-50, controller=controller,precision=0.001))
-    tests.append(MoveTestAbsolute(test_name="Absolute Move Test Micro", posn=10.005, controller=controller, precision=0.001))
+    tests.append(MoveTestAbsolute(test_name="Absolute Move Test Micro", posn=-49.005, controller=controller, precision=0.001))
     tests.append(MoveTestAbsolute(test_name="Absolute Move Test Macro Precise", posn=25.005, controller=controller, precision=0.001))
 
     # Relative Move Tests
     tests.append(MoveTestRelative(test_name="Relative Move Test Macro", posn_add=-50, controller=controller,precision=0.001))
-    tests.append(MoveTestRelative(test_name="Relative Move Test Micro", posn_add=10.005, controller=controller, precision=0.001))
+    tests.append(MoveTestRelative(test_name="Relative Move Test Micro", posn_add=0.005, controller=controller, precision=0.001))
     tests.append(MoveTestRelative(test_name="Relative Move Test Macro Precise", posn_add=25.005, controller=controller, precision=0.001))
     
     # Repeatability Tests
@@ -58,13 +58,13 @@ def tests_to_run(controller) -> List[MotionControlTest]:
 
     # Overshoot Tests
     tests.append(OvershootTest(test_name="Overshoot Test Slow", velocity=0.001, controller=controller, precision=0.001, distance=10))
-    tests.append(OvershootTest(test_name="Overshoot Test Medium", velocity=0.0025, controller=controller, precision=0.001, distance=0))
+    tests.append(OvershootTest(test_name="Overshoot Test Medium", velocity=0.0025, controller=controller, precision=0.001, distance=10))
     tests.append(OvershootTest(test_name="Overshoot Test Fast", velocity=0.005, controller=controller, precision=0.001, distance=10))
     
     # Velocity Tests
-    tests.append(VelocityTest(test_name="Velocity Test Slow", velocity=0.001, controller=controller, precision=0.001))
-    tests.append(VelocityTest(test_name="Velocity Test Medium", velocity=0.0025, controller=controller, precision=0.001))
-    tests.append(VelocityTest(test_name="Velocity Test Fast", velocity=0.004, controller=controller, precision=0.001))
+    tests.append(VelocityTest(test_name="Velocity Test Slow", velocity=0.001, controller=controller, precision=0.0001))
+    tests.append(VelocityTest(test_name="Velocity Test Medium", velocity=0.0025, controller=controller, precision=0.0001))
+    tests.append(VelocityTest(test_name="Velocity Test Fast", velocity=0.004, controller=controller, precision=0.0001))
 
     # Limit Test
     tests.append(LimitTest(test_name="Limit Test", controller=controller))                                                                             

@@ -37,15 +37,20 @@ class VelocityTest(MotionControlTest):
         controller.move_to_end_pos_wait(motor)  # Ensure we have full travel in the negative direction
         controller.set_velocity(motor, self.velocity)  # Program target velocity
         controller.move_to_end_neg(motor)  # Begin moving negative
-        time.sleep(2)  # Allow motion to stabilize before sampling
+        sleep(2)  # Allow motion to stabilize before sampling
+
+        vol = []
+
+        while not controller.in_pos(motor):
+            vol.append(controller.get_velocity(encoder))
 
         # Gather actual velocity samples (ActVel) and average them.
-        controller.start_gather(chan=motor, max_sample=5000, meas_item=[f"Motor[{motor}].ActVel"])
-        vol = controller.end_gather(
-            save_to_filename="velocity_output.txt",
-            meas_item=[f"Motor[{motor}].ActVel"],
-            as_tuple=False
-        )
+        # controller.start_gather(chan=motor, max_sample=5000, meas_item=[f"Motor[{motor}].ActVel"])
+        # vol = controller.end_gather(
+        #    save_to_filename="velocity_output.txt",
+        #    meas_item=[f"Motor[{motor}].ActVel"],
+        #    as_tuple=False
+        # )
         vol = sum(vol) / len(vol)  # Average over samples
         # Alternative (instant) approach was: controller.get_velocity(encoder)
 
@@ -55,7 +60,7 @@ class VelocityTest(MotionControlTest):
             success=success,
             generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value=f"{self.velocity} ± {self.precision}",
+            expected_value=f"{self.velocity} +/- {self.precision}",
             actual_value=vol,
             duration=time() - st,  # Use actual duration instead of "N/A"
             extra_data={
