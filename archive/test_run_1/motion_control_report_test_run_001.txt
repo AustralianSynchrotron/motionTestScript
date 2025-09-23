@@ -1,0 +1,10 @@
+Motion Control Test Report
+==========================
+
+Test ID: fe6c1469-dc26-4361-913f-ec875e8b1302
+Generic Name: Absolute Move Test
+Test Name: Absolute Move Test Macro
+Success: True
+Expected Value: Position -50 ± 0.001
+Actual Value: -50.0
+Test Duration: 10.499 seconds

@@ -1,18 +1,148 @@
 Motion Control Test Report
 ==========================
 
+Test ID: 8dfae468-93da-437f-927e-3786b6796270
+Generic Name: Absolute Move Test
 Test Name: Absolute Move Test Macro
 Success: True
-Expected Value: -50
+Expected Value: Position -50 +/- 0.001
 Actual Value: -50.0
-Test Duration: 10.493 seconds
-Gathered Data: {}
+Test Duration: 12.902 seconds
+Extra Data: {'initial_position': 0.0, 'target_position': -50, 'final_position': -50.0, 'position_error': 0.0, 'precision': 0.001}
 -------------------------------
+Test ID: e7ac44bc-30b4-4653-8fdf-296762174647
+Generic Name: Absolute Move Test
+Test Name: Absolute Move Test Micro
+Success: True
+Expected Value: Position -49.005 +/- 0.001
+Actual Value: -49.005
+Test Duration: 0.682 seconds
+Extra Data: {'initial_position': -50.0, 'target_position': -49.005, 'final_position': -49.005, 'position_error': 0.0, 'precision': 0.001}
+-------------------------------
+Test ID: fef97299-b24d-4e9b-b19c-a7b3319bb4b1
+Generic Name: Absolute Move Test
+Test Name: Absolute Move Test Macro Precise
+Success: True
+Expected Value: Position 25.005 +/- 0.001
+Actual Value: 25.0055
+Test Duration: 18.957 seconds
+Extra Data: {'initial_position': -49.005, 'target_position': 25.005, 'final_position': 25.0055, 'position_error': 0.0005000000000023874, 'precision': 0.001}
+-------------------------------
+Test ID: d2958b9f-339b-44b3-a0f3-d2d1c637dca4
+Generic Name: Relative Move Test
+Test Name: Relative Move Test Macro
+Success: True
+Expected Value: Relative move of -50 +/- 0.001
+Actual Value: -49.9995
+Test Duration: 12.878 seconds
+Extra Data: {'initial_position': 25.0055, 'final_position': -24.994, 'target_displacement': -50, 'actual_displacement': -49.9995}
+-------------------------------
+Test ID: 85ce6347-dd94-4b9e-882b-fe649aac963e
+Generic Name: Relative Move Test
+Test Name: Relative Move Test Micro
+Success: False
+Expected Value: Relative move of 0.005 +/- 0.001
+Actual Value: 0.003748046874999744
+Test Duration: 0.657 seconds
+Extra Data: {'initial_position': -24.994, 'final_position': -24.990251953125, 'target_displacement': 0.005, 'actual_displacement': 0.003748046874999744}
+-------------------------------
+Test ID: 4fbb3343-4e01-4a9b-a89e-0d32c85d3fc8
+Generic Name: Relative Move Test
+Test Name: Relative Move Test Macro Precise
+Success: True
+Expected Value: Relative move of 25.005 +/- 0.001
+Actual Value: 25.005251953125
+Test Duration: 6.722 seconds
+Extra Data: {'initial_position': -24.990251953125, 'final_position': 0.0149999999999999, 'target_displacement': 25.005, 'actual_displacement': 25.005251953125}
+-------------------------------
+Test ID: cd5d78e3-1211-4504-ba8a-5b81ba0ed795
+Generic Name: Repeatability Test
+Test Name: Repeatability Test Micro
+Success: True
+Expected Value: Target: 10.005, Margin: 0.01, Max STD: 0.1
+Actual Value: 10.004549609375001
+Test Duration: 9.145 seconds
+Extra Data: {'target_position': 10.005, 'average_position': 10.004549609375001, 'largest_deviation': 0.0005000000000006111, 'standard_deviation': 0.00011092993482084012, 'individual_results': [10.004748046875, 10.0045, 10.0045, 10.0045, 10.0045]}
+-------------------------------
+Test ID: 0b68092e-8afd-4b57-b89a-82ae4f9e21f6
+Generic Name: Repeatability Test
+Test Name: Repeatability Test Macro
+Success: True
+Expected Value: Target: 20, Margin: 0.01, Max STD: 0.1
+Actual Value: 19.9995
+Test Duration: 29.773 seconds
+Extra Data: {'target_position': 20, 'average_position': 19.9995, 'largest_deviation': 0.0004999999999988347, 'standard_deviation': 0.0, 'individual_results': [19.9995, 19.9995, 19.9995, 19.9995, 19.9995]}
+-------------------------------
+Test ID: c92eb655-59a9-46e7-8698-759153f2854c
+Generic Name: Repeatability Test
+Test Name: Repeatability Test Micro Large
+Success: True
+Expected Value: Target: 20.005, Margin: 0.01, Max STD: 0.1
+Actual Value: 20.0055
+Test Duration: 29.464 seconds
+Extra Data: {'target_position': 20.005, 'average_position': 20.0055, 'largest_deviation': 0.0005000000000023874, 'standard_deviation': 0.0, 'individual_results': [20.0055, 20.0055, 20.0055, 20.0055, 20.0055]}
+-------------------------------
+Test ID: 15b7fd7b-8c52-4bcc-8ae3-69b4581f5220
+Generic Name: Overshoot Test
+Test Name: Overshoot Test Slow
+Success: True
+Expected Value: Overshoot <= 0.001
+Actual Value: 0.0
+Test Duration: 0.500 seconds
+Extra Data: {'peak_position': 10.0, 'target_distance': 10, 'overshoot': 0.0}
+-------------------------------
+Test ID: 7c81fecc-492f-451d-877a-16d1b7d95373
+Generic Name: Overshoot Test
+Test Name: Overshoot Test Medium
+Success: True
+Expected Value: Overshoot <= 0.001
+Actual Value: -0.0009999999999994458
+Test Duration: 4.363 seconds
+Extra Data: {'peak_position': 9.999, 'target_distance': 10, 'overshoot': -0.0009999999999994458}
+-------------------------------
+Test ID: 62a7ecaa-674f-433b-a501-6f550aeb0fbb
+Generic Name: Overshoot Test
+Test Name: Overshoot Test Fast
+Success: True
+Expected Value: Overshoot <= 0.001
+Actual Value: 0.0
+Test Duration: 2.366 seconds
+Extra Data: {'peak_position': 10.0, 'target_distance': 10, 'overshoot': 0.0}
+-------------------------------
+Test ID: 63f3c9db-91ba-43bd-9dd7-4f66b58457fb
+Generic Name: Velocity Test
+Test Name: Velocity Test Slow
+Success: True
+Expected Value: 0.001 +/- 0.0001
+Actual Value: -0.0009981647841548352
+Test Duration: 166.726 seconds
+Extra Data: {'target_velocity': 0.001, 'measured_velocity': -0.0009981647841548352, 'precision': 0.0001}
+-------------------------------
+Test ID: b30035df-0391-4ca6-b70c-be5a6f319169
+Generic Name: Velocity Test
+Test Name: Velocity Test Medium
+Success: True
+Expected Value: 0.0025 +/- 0.0001
+Actual Value: -0.0024960767050333805
+Test Duration: 211.644 seconds
+Extra Data: {'target_velocity': 0.0025, 'measured_velocity': -0.0024960767050333805, 'precision': 0.0001}
+-------------------------------
+Test ID: 599e8080-aa9b-4cf2-8e11-7ff8d8cc2fce
+Generic Name: Velocity Test
+Test Name: Velocity Test Fast
+Success: True
+Expected Value: 0.004 +/- 0.0001
+Actual Value: -0.003985852011418619
+Test Duration: 99.193 seconds
+Extra Data: {'target_velocity': 0.004, 'measured_velocity': -0.003985852011418619, 'precision': 0.0001}
+-------------------------------
+Test ID: c7777074-5dd3-4f3d-80a5-aed9f66a3426
+Generic Name: Limit Test
 Test Name: Limit Test
 Success: True
-Expected Value: Both limits should be reached
-Actual Value: Positive: 1, Negative: 1
-Test Duration: 51.085 seconds
-Gathered Data: {'positive_end_limit': 1, 'negative_end_limit': 1}
+Expected Value: Both limit switches must activate
+Actual Value: Positive: True, Negative: True
+Test Duration: 44.675 seconds
+Extra Data: {'positive_limit_active': True, 'negative_limit_active': True, 'max_speed_used': 0.004}
 -------------------------------
 End of Report

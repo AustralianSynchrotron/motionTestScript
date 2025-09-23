@@ -1,0 +1,18 @@
+Motion Control Test Report
+==========================
+
+Test Name: Relative Move Test Macro
+Success: True
+Expected Value: 20
+Actual Value: 19.9995
+Test Duration: 5.475 seconds
+Gathered Data: {}
+-------------------------------
+Test Name: Relative Move Test Macro
+Success: True
+Expected Value: 20
+Actual Value: 19.999999999999996
+Test Duration: 5.366 seconds
+Gathered Data: {}
+-------------------------------
+End of Report
