@@ -41,8 +41,19 @@ class MoveTestRelative(MotionControlTest):
 
         success = abs(expected_pos - final_pos) < self.precision
 
-        result = MotionControlResult(id=self.id, success=success,
-                                     test_name=self.test_name, expected_value=self.posn_add,
-                                     actual_value=final_pos-initial_pos, duration=duration)
-
+        result = MotionControlResult(
+            id=self.id,
+            success=success,
+            generic_name=self.generic_name,
+            test_name=self.test_name,
+            expected_value=f"Relative move of {self.posn_add} ± {self.precision}",
+            actual_value=final_pos - initial_pos,
+            duration=duration,
+            extra_data={
+                'initial_position': initial_pos,
+                'final_position': final_pos,
+                'target_displacement': self.posn_add,
+                'actual_displacement': final_pos - initial_pos
+            }
+        )
         return result

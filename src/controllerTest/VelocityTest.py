@@ -53,12 +53,15 @@ class VelocityTest(MotionControlTest):
         result = MotionControlResult(
             id=self.id,
             success=success,
+            generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value=f"Velocity should be within {self.precision} of {self.velocity}",
+            expected_value=f"{self.velocity} ± {self.precision}",
             actual_value=vol,
-            duration="N/A",  # Duration intentionally not reported
-            gathered_data={
-                'velocity': vol
+            duration=time() - st,  # Use actual duration instead of "N/A"
+            extra_data={
+                'target_velocity': self.velocity,
+                'measured_velocity': vol,
+                'precision': self.precision
             }
         )
         return result

@@ -59,15 +59,17 @@ class RepeatabilityTest(MotionControlTest):
         result = MotionControlResult(
             id=self.id,
             success=success,
+            generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value=self.endPosn,
+            expected_value=f"Target: {self.endPosn}, Margin: {self.errorMargin}, Max STD: {self.max_std}",
             actual_value=average_final_pos,
             duration=duration,
-            gathered_data={
-                'average_final_pos': average_final_pos,
+            extra_data={
+                'target_position': self.endPosn,
+                'average_position': average_final_pos,
                 'largest_deviation': largest_deviation,
                 'standard_deviation': standard_dev,
-                'runs': run_results
+                'individual_results': run_results
             }
         )
         return result

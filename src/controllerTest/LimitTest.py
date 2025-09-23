@@ -53,15 +53,17 @@ class LimitTest(MotionControlTest):
         success = bool(positive_end_result and negative_end_result)
         
         result = MotionControlResult(
-             id=self.id,
+            id=self.id,
             success=success,
+            generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value="Both limits should be reached",
-            actual_value=f"Positive: {positive_end_result}, Negative: {negative_end_result}",
-            duration=duration,  # Duration between first move start and final read
-            gathered_data={
-                'positive_end_limit': positive_end_result,
-                'negative_end_limit': negative_end_result
+            expected_value="Both limit switches must activate",
+            actual_value=f"Positive: {bool(positive_end_result)}, Negative: {bool(negative_end_result)}",
+            duration=duration,
+            extra_data={
+                'positive_limit_active': bool(positive_end_result),
+                'negative_limit_active': bool(negative_end_result),
+                'max_speed_used': max_speed
             }
         )
 

@@ -62,6 +62,7 @@ class MotionControlTest(ABC):
                 result = MotionControlResult(
                     id=self.id,
                     success=False,
+                    generic_name=self.generic_name,
                     test_name=self.test_name,
                     expected_value=None,
                     actual_value=None,

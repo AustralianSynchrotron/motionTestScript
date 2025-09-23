@@ -30,9 +30,17 @@ class MoveTestAbsolute(MotionControlTest):
         result = MotionControlResult(
             id=self.id,
             success=success,
+            generic_name=self.generic_name,
             test_name=self.test_name,
-            expected_value=self.posn,
+            expected_value=f"Position {self.posn} ± {self.precision}",
             actual_value=final_pos,
-            duration=duration
+            duration=duration,
+            extra_data={
+                'initial_position': initial_pos,
+                'target_position': self.posn,
+                'final_position': final_pos,
+                'position_error': final_pos - self.posn,
+                'precision': self.precision
+            }
         )
         return result

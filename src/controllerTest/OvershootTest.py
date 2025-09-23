@@ -61,10 +61,16 @@ class OvershootTest(MotionControlTest):
         result = MotionControlResult(
             id=self.id,
             success=success,
+            generic_name=self.generic_name, 
             test_name=self.test_name,
-            expected_value="<= " + str(self.precision),
+            expected_value=f"Overshoot <= {self.precision}",
             actual_value=overshoot,
-            duration=duration
+            duration=duration,
+            extra_data={
+                'peak_position': peak_position,
+                'target_distance': self.distance,
+                'overshoot': overshoot
+            }
         )
         return result
         
