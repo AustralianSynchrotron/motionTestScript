@@ -18,7 +18,7 @@ def main():
         gather_data = True
         gather_data_items = ["IqCmd.a", "Pos.a"]
         timeout = 300
-        run_id = "test_run_002"
+        run_id = "test_run_003"
 
         controller.initialise(chan=motor, enc=encoder)
 
