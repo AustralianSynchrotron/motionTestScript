@@ -18,7 +18,7 @@ def main():
         gather_data = True
         gather_data_items = ["IqCmd.a", "Pos.a"]
         timeout = 300
-        run_id = "test_run_001"
+        run_id = "test_run_003"
 
         controller.initialise(chan=motor, enc=encoder)
 
@@ -28,8 +28,6 @@ def main():
 
         
         ReportGenerator(results).generate_report(f"results/motion_control_report_{run_id}.txt")
-
-        controller.custom_command_blocking(chan=2, cmd="#chanj=2")
 
         controller.disconnect()
 
@@ -54,7 +52,7 @@ def tests_to_run(controller) -> List[MotionControlTest]:
     # Repeatability Tests
     tests.append(RepeatabilityTest(test_name="Repeatability Test Micro", startPosn=10, endPosn=10.005, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
     tests.append(RepeatabilityTest(test_name="Repeatability Test Macro", startPosn=10, endPosn=20, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
-    tests.append(RepeatabilityTest(test_name="Repeatability Test Micro Large", startPosn=10, endPosn=20.005, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
+    tests.append(RepeatabilityTest(test_name="Repeatability Test Micro Large", startPosn=0, endPosn=20.005, controller=controller, errorMargin=0.01, max_std=0.1, precision=0.001, runs=5))
 
     # Overshoot Tests
     tests.append(OvershootTest(test_name="Overshoot Test Slow", velocity=0.001, controller=controller, precision=0.001, distance=10))
