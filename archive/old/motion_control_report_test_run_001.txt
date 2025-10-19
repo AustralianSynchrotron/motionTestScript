@@ -1,0 +1,18 @@
+Motion Control Test Report
+==========================
+
+Test Name: Absolute Move Test Macro
+Success: True
+Expected Value: -50
+Actual Value: -50.0
+Test Duration: 10.493 seconds
+Gathered Data: {}
+-------------------------------
+Test Name: Limit Test
+Success: True
+Expected Value: Both limits should be reached
+Actual Value: Positive: 1, Negative: 1
+Test Duration: 51.085 seconds
+Gathered Data: {'positive_end_limit': 1, 'negative_end_limit': 1}
+-------------------------------
+End of Report
